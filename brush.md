@@ -55,16 +55,77 @@
 
 ### Arithmetics
 * add
+
+		x + y
 * sub
+
+		x - y
 * mul
+
+		x * y
 * div
+
+		x / y
 * sin
+
+		sin x
+		sin (x + y)
 * cos
+
+		cos x
+		cos (x - y)
 * tan
+
+		tan x
+		tan (x * y)
 * ln
+
+		ln x
+		ln (x  / y)
 * log
 
-Future features
+		log x
+		log (x + y)
+
+#### Future features
+
 * sqrt
+
+		sqrt x
+		sqrt (x - y)
 * mod
+
+		mod x
+		mod (x * y)
 * exp
+	> Calculate the exponent of x^y
+	
+		exp (x, y)
+
+### Strings
+> Coming soon.
+
+* Strings
+	> A string starts and ends with quotes.
+	
+		“string“
+* Characters
+	> A character represents a one byte long string.
+	
+		`c`
+
+### Identifiers
+> Identifiers have to start case letter or an underscore and may contain letters, underscores and dashes afterwards.
+	
+		identifier
+		_identifier
+		FINAL_IDENTIFIER
+	
+> Define a variable
+	
+		> newIdentifier;
+
+### Control structures
+
+### Methods
+	
