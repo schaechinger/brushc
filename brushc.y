@@ -1,9 +1,14 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "symboltable.h"
 %}
 
-%token NUMBER ID
+%union { int i; double d; float f; node *n; char *s; char c; }
+
+%token <i> NUMBER <d> DOUBLE <f> FLOAT
+%token <n> ID
 
 %token COMMA SEMICOLON
 %token EXPORTER IMPORTER
@@ -50,48 +55,65 @@ expr:	expr MINUS div	{ printf("sub "); }
 	|	expr MINUS ln	{ printf("sub "); }
 	|	expr MINUS log	{ printf("sub "); };
 
-prod:	number;
-prod:	prod MUL number
+prod:	atom;
+prod:	prod MUL atom
 		{ printf("mul "); };
 
-div:	number;
-div:	div DIV number
+div:	atom;
+div:	div DIV atom
 		{ printf("div "); };
 
-cos:	COS number
+cos:	COS atom
 		{ printf("cos "); };
 
-sin:	SIN number
+sin:	SIN atom
 		{ printf("sin "); };
 
-tan:	TAN number
+tan:	TAN atom
 		{ printf("tan "); };
 
-ln:		LN number
+ln:		LN atom
 		{ printf("ln "); };
 
-log:	LOG number
+log:	LOG atom
 		{ printf("log "); };
 
-number:	NUMBER			{ printf("%d ", $1); }
+atom:	NUMBER			{ printf("%d ", $1); }
 	|	MINUS NUMBER	{ printf("-%d ", $2); }
+	|	ID				{ printf("%s ", $1->symbol); }
 	|	OPENBRACE expr CLOSEBRACE;
 
 point:	expr COMMA expr;
+
+	/* I D E N T I F I E R */
+
+	/* stmt:	expr EXPORTER ID SEMICOLON */
+stmt:	expr EXPORTER
+		ID SEMICOLON {
+						if ($3->isDeclared == 1)
+						{
+							printf("/%s exch store\n", $3->symbol);
+						}
+						else
+						{
+							printf("/%s exch def\n", $3->symbol);
+							$3->isDeclared = 1;
+						}
+					};
 
 	/* C O L O R */
 
 stmt:	SAVECOLOR OPENBRACE
 		NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE
-		EXPORTER NUMBER SEMICOLON
-		{ printf("/color%d { %f %f %f setrgbcolor } def\n", $10, $3 / 255.0, $5 / 255.0, $7 / 255.0); };
+		EXPORTER ID SEMICOLON
+		{ printf("/%s { %f %f %f setrgbcolor } def\n", $10->symbol, $3 / 255.0, $5 / 255.0, $7 / 255.0); };
 
 stmt:	USECOLOR OPENBRACE
 		NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE SEMICOLON
 		{ printf("%f %f %f setrgbcolor\n", $3 / 255.0, $5 / 255.0, $7 / 255.0); };
 
-stmt:	USECOLOR OPENBRACE NUMBER CLOSEBRACE SEMICOLON
-		{ printf("color%d\n", $3); };
+stmt:	USECOLOR OPENBRACE ID CLOSEBRACE SEMICOLON
+		{ printf("%s\n", $3->symbol); };
 
 	/* S I Z E */
 
@@ -102,16 +124,16 @@ stmt:	USESIZE OPENBRACE NUMBER CLOSEBRACE SEMICOLON
 
 stmt:	SAVEBRUSH OPENBRACE
 		NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE
-		EXPORTER NUMBER SEMICOLON
-		{ printf("/brush%d { %f %f %f setrgbcolor\n%d setlinewidth } def\n", $12, $3 / 255.0, $5 / 255.0, $7 / 255.0, $9); };
+		EXPORTER ID SEMICOLON
+		{ printf("/%s { %f %f %f setrgbcolor\n%d setlinewidth } def\n", $12->symbol, $3 / 255.0, $5 / 255.0, $7 / 255.0, $9); };
 
 stmt:	SAVEBRUSH OPENBRACE
-		NUMBER COMMA NUMBER CLOSEBRACE
-		EXPORTER NUMBER SEMICOLON
-		{ printf("/brush%d { color%d\n%d setlinewidth } def\n", $8, $3, $5); };
+		ID COMMA NUMBER CLOSEBRACE
+		EXPORTER ID SEMICOLON
+		{ printf("/%s { %s\n%d setlinewidth } def\n", $8->symbol, $3->symbol, $5); };
 
-stmt:	USEBRUSH OPENBRACE NUMBER CLOSEBRACE SEMICOLON
-		{ printf("brush%d\n", $3); };
+stmt:	USEBRUSH OPENBRACE ID CLOSEBRACE SEMICOLON
+		{ printf("%s\n", $3->symbol); };
 
 	/* D R A W */
 

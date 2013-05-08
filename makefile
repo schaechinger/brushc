@@ -21,8 +21,8 @@ brushc.tab.c: brushc.y
 brushc.tab.h: brushc.y
 	bison -d brushc.y
 
-brushc: lex.yy.c brushc.tab.h brushc.tab.c
-	gcc lex.yy.c brushc.tab.c -o brushc
+brushc: lex.yy.c brushc.tab.h brushc.tab.c symboltable.h symboltable.c
+	gcc lex.yy.c brushc.tab.c symboltable.c -o brushc
 
 brush.ps: brush.brs brushc
 	./brushc < brush.brs > brush.ps

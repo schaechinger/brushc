@@ -5,9 +5,25 @@
 
 ## Syntax
 
+### Numbers
+* Integer
+
+		0
+		1234
+
+* Double
+
+		0.0
+		1234.56
+	
+* Float
+
+		0.0f
+		1234.56f
+
 ### Colors
 * Save color
-	> Save a color with it’s `rgb` values and a `name` (currently the name must be an integer).
+	> Save a color with it’s `rgb` values and a `name`.
 	
 		saveColor(red, green, blue) > name;
 		
@@ -102,28 +118,17 @@
 	
 		exp (x, y)
 
-### Strings
-> Coming soon.
-
-* Strings
-	> A string starts and ends with quotes.
-	
-		“string“
-* Characters
-	> A character represents a one byte long string.
-	
-		`c`
-
 ### Identifiers
 > Identifiers have to start case letter or an underscore and may contain letters, underscores and dashes afterwards.
 	
 		identifier
 		_identifier
-		FINAL_IDENTIFIER
+		myFirstIdentifier
 	
-> Define a variable
+> Defining an identifier is like edit the current value. The identifier is defined the first time it is used.
 	
-		> newIdentifier;
+		5 > id;
+		5 * id > id;
 
 ### Control structures
 

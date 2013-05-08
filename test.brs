@@ -6,7 +6,10 @@
 // Copyright © 2013 Delivery Studios. All rights reserved.
 //
 
-// draw a polygon
-from 10+(20+5)*2+2*3*10,100 to 50,cos(50)+sin(50);
+// init variables
+100 > a;
+4 * a > b;
+2 * a > a;
 
-from 50+50,200-100 to 400+200,200;
+// draw a polygon
+from a,a to b,b;
