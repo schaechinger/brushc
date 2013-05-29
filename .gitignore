@@ -3,3 +3,4 @@ brushc.tab.h
 brushc
 lex.yy.c
 *.ps
+*.output

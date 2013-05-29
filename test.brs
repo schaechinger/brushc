@@ -16,7 +16,7 @@
 saveColor(0, 110, 160) > blue;
 saveColor(178, 23, 0) > red;
 saveColor(0, 250, 0) > green;
-saveColor(0, 250, 250) > yellow;
+saveColor(250, 250, 0) > yellow;
 
 useColor(red);
 
@@ -25,17 +25,22 @@ for (current > i; c >> i; i + 1 > i)
 	x > tempX;
 	y > tempY;
 	
-	if (i <= c / 2)
+	// switch colors
+	if (i % 4 == 0)
 	{
-		useColor(blue);
+		useColor(red);
 	}
-	else if (i == c - 1)
+	else if (i % 4 == 1)
 	{
 		useColor(green);
 	}
+	else if (i % 4 == 2)
+	{
+		useColor(yellow);
+	}
 	else
 	{
-		useColor(red);
+		useColor(blue);
 	}
 	
 	floor(c / 2) > temp;
