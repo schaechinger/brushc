@@ -1,6 +1,9 @@
 %{
 #include "symboltable.h"
 #include "brushc.tab.h"
+
+int line = 1;
+int column = 1;
 %}
 
 %option noyywrap
@@ -30,13 +33,18 @@ circle					return CIRCLE;
 \>						return EXPORTER;
 \<						return IMPORTER;
 
+\:						return DOUBLEPOINT;
+
+\=						return EQUALS;
+\!						return NOT;
+
 	/* A R I T H M E T I C S */
 
 \+						return PLUS;
 \-						return MINUS;
 \*						return MUL;
 \/						return DIV;
-mod						return MOD;
+\%						return MOD;
 
 	/* Trigonometry */
 cos						return COS;
@@ -47,22 +55,43 @@ tan						return TAN;
 log						return LOG;
 ln						return LN;
 
+	/* Conditions */
+if						return IF;
+else					return ELSE;
+while					return WHILE;
+loop					return LOOP;
+exit					return EXIT;
+do						return DO;
+for						return FOR;
+
 	/* Braces */
 \(						return OPENBRACE;
 \)						return CLOSEBRACE;
-\{						return OPENCURLYBRACE;
-\}						return CLOSECURLYBRACE;
+\{						{
+							openScope();
+							return OPENCURLYBRACE;
+						};
+\}						{
+							closeScope();
+							return CLOSECURLYBRACE;
+						};
 
 \/\/[^\n]*				;
 \/\*([^*]|\*[^/])*\*+\/	;
 
 	/* B R U S H   S P E C I F I C */
 
+floor				return FLOOR;
 saveColor			return SAVECOLOR;
 useColor			return USECOLOR;
 useSize				return USESIZE;
 saveBrush			return SAVEBRUSH;
 useBrush			return USEBRUSH;
+
+\n					{
+						line++;
+						column = 1;
+					}
 
 	/* Cut all whilespaces and linebreaks */
 [[:space:]]			;
@@ -79,6 +108,9 @@ useBrush			return USEBRUSH;
 					}
 
 	/* Error state */
-.					fprintf(stderr,"unexpected characted: %s\n", yytext);
+.					{
+						fprintf(stderr,"unexpected characted: %s at %d:%d\n",
+							yytext, line, column);
+					}
 
 %%

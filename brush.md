@@ -94,6 +94,9 @@
 
 		tan x
 		tan (x * y)
+* mod
+
+		x % y
 * ln
 
 		ln x
@@ -103,34 +106,75 @@
 		log x
 		log (x + y)
 
+### Identifiers
+> Identifiers have to start case letter or an underscore and may contain letters, underscores and dashes afterwards.
+	
+	identifier
+	_identifier
+	myFirstIdentifier
+	
+> Defining an identifier is like editing the current value. The identifier is defined the first time it is used.
+	
+	5 > id;
+	5 * id > id;
+	
+> To force the initialization of a new variable you can type the following statement. This is very useful if you want to declare a local variable that is called like a global variable.
+
+	5 :> id;
+
+### Control structures
+
+* if
+	> code gets only executed if the bool is true
+	
+		if (bool)
+		{
+			statement;
+		}
+		else if (bool)
+		{
+			statement;
+		}
+		else
+		{
+			statement;
+		}
+
+* do
+	> loops x times
+	
+		do (5)
+		{
+			statement;
+		}
+	
+* while
+	> repeat the code while the condicion is valid
+	
+		while (bool)
+		{
+			statement;
+		}
+	
+* for
+	> repeat the code until the condition is invalid
+	
+		for (0 > i; 5 << i; i + 1 > i)
+		{
+			statement;
+		}	
+
 #### Future features
 
 * sqrt
 
 		sqrt x
 		sqrt (x - y)
-* mod
 
-		mod x
-		mod (x * y)
 * exp
 	> Calculate the exponent of x^y
 	
 		exp (x, y)
-
-### Identifiers
-> Identifiers have to start case letter or an underscore and may contain letters, underscores and dashes afterwards.
-	
-		identifier
-		_identifier
-		myFirstIdentifier
-	
-> Defining an identifier is like edit the current value. The identifier is defined the first time it is used.
-	
-		5 > id;
-		5 * id > id;
-
-### Control structures
 
 ### Methods
 	

@@ -16,10 +16,10 @@ lex.yy.c: brushc.l
 	flex brushc.l
 
 brushc.tab.c: brushc.y
-	bison -d brushc.y
+	bison -d -t -v brushc.y
 
 brushc.tab.h: brushc.y
-	bison -d brushc.y
+	bison -d -t -v brushc.y
 
 brushc: lex.yy.c brushc.tab.h brushc.tab.c symboltable.h symboltable.c
 	gcc lex.yy.c brushc.tab.c symboltable.c -o brushc

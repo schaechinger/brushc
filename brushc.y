@@ -3,6 +3,8 @@
 #include <stdlib.h>
 
 #include "symboltable.h"
+
+extern line;
 %}
 
 %union { int i; double d; float f; node *n; char *s; char c; }
@@ -12,24 +14,50 @@
 
 %token COMMA SEMICOLON
 %token EXPORTER IMPORTER
+%token DOUBLEPOINT
 %token OPENBRACE CLOSEBRACE OPENCURLYBRACE CLOSECURLYBRACE
 
 %token PLUS MINUS MUL DIV MOD
+%token EQUALS NOT
 %token COS SIN TAN
 %token LOG LN
 
 %token BY FROM TO
 %token FILL
 %token CIRCLE
+%token FLOOR
+
+%token IF ELSE WHILE LOOP EXIT DO FOR
 
 %token SAVECOLOR USECOLOR USESIZE
 %token SAVEBRUSH USEBRUSH
 
 %%
 
-program: { printf("%%PS Adobe\n"); } stmtlist { printf("\nshowpage\n"); } ;
-stmtlist:;
-stmtlist: stmtlist stmt;
+program:	header varlist stmtlist trailer ;
+header:		{ printf("%%PS-Adobe\n"); };
+trailer:	{ printf("\nshowpage\n"); };
+
+stmtlist:	;
+stmtlist:	stmtlist stmt;
+
+varlist:	;
+varlist:	varlist var SEMICOLON;
+
+	/* boolean declarations */
+bool: expr IMPORTER IMPORTER expr	{ printf("lt "); }
+	| expr IMPORTER EQUALS expr		{ printf("le "); }
+	| expr EXPORTER EXPORTER expr	{ printf("gt "); }
+	| expr EXPORTER EQUALS expr		{ printf("ge "); }
+	| expr EQUALS EQUALS expr		{ printf("eq "); }
+	| expr NOT EQUALS expr			{ printf("ne "); };
+
+stmts:	stmts stmt
+	|	stmt;
+
+block:	OPENCURLYBRACE	{ printf("1 dict begin\n"); }
+		stmts
+		CLOSECURLYBRACE	{ printf("end\n"); };
 
 	/* A R I T H M E T I C S */
 
@@ -39,28 +67,17 @@ expr:	prod
 	|	sin
 	|	tan
 	|	ln
-	|	log;
-expr:	expr PLUS div	{ printf("add "); }
-	|	expr PLUS prod	{ printf("add "); }
-	|	expr PLUS cos	{ printf("add "); }
-	|	expr PLUS sin	{ printf("add "); }
-	|	expr PLUS tan	{ printf("add "); }
-	|	expr PLUS ln	{ printf("add "); }
-	|	expr PLUS log	{ printf("add "); };
-expr:	expr MINUS div	{ printf("sub "); }
-	|	expr MINUS prod	{ printf("sub "); }
-	|	expr MINUS cos	{ printf("sub "); }
-	|	expr MINUS sin	{ printf("sub "); }
-	|	expr MINUS tan	{ printf("sub "); }
-	|	expr MINUS ln	{ printf("sub "); }
-	|	expr MINUS log	{ printf("sub "); };
+	|	log
+	|	floor
+	|	expr PLUS expr { printf("add "); }
+	|	expr MINUS expr { printf("sub "); }
+	|	expr MOD expr { printf("mod "); };
 
 prod:	atom;
 prod:	prod MUL atom
 		{ printf("mul "); };
 
-div:	atom;
-div:	div DIV atom
+div:	atom DIV atom
 		{ printf("div "); };
 
 cos:	COS atom
@@ -78,6 +95,9 @@ ln:		LN atom
 log:	LOG atom
 		{ printf("log "); };
 
+floor:	FLOOR atom
+		{ printf("floor "); };
+
 atom:	NUMBER			{ printf("%d ", $1); }
 	|	MINUS NUMBER	{ printf("-%d ", $2); }
 	|	ID				{ printf("%s ", $1->symbol); }
@@ -87,19 +107,29 @@ point:	expr COMMA expr;
 
 	/* I D E N T I F I E R */
 
+	/* force new declaration of a variable
+		this is very useful for local variables */
+var:	expr DOUBLEPOINT EXPORTER ID
+		{
+			printf("/%s exch def\n", $4->symbol);
+			$4->isDeclared = 1;
+		}
+
 	/* stmt:	expr EXPORTER ID SEMICOLON */
-stmt:	expr EXPORTER
-		ID SEMICOLON {
-						if ($3->isDeclared == 1)
-						{
-							printf("/%s exch store\n", $3->symbol);
-						}
-						else
-						{
-							printf("/%s exch def\n", $3->symbol);
-							$3->isDeclared = 1;
-						}
-					};
+var:	expr EXPORTER
+		ID	{
+				if ($3->isDeclared == 1)
+				{
+					printf("/%s exch store\n", $3->symbol);
+				}
+				else
+				{
+					printf("/%s exch def\n", $3->symbol);
+					$3->isDeclared = 1;
+				}
+			};
+
+stmt: var SEMICOLON;
 
 	/* C O L O R */
 
@@ -166,16 +196,54 @@ stmt:	circle SEMICOLON
 	/* Ability to fill the circle */
 stmt:	circle;
 
+	/* Conditions */
+
+elsec:	;
+elsec:	ifc
+		ELSE	{ printf("\n{\n"); }
+		elsec	{ printf("} ifelse"); }
+	|	ifc
+		ELSE	{ printf("\n{\n"); }
+		block	{ printf("} ifelse"); };
+
+ifc:	IF
+		OPENBRACE bool CLOSEBRACE { printf("\n{\n"); }
+		block { printf("} "); };
+
+stmt:	elsec { printf("\n"); }
+	|	ifc { printf("if\n"); }
+	|	IF error { yyerror("missing '(' after 'if'"); };
+
+stmt:	LOOP { printf("\n{\n"); }
+		block { printf("} loop\n"); };
+
+stmt:	EXIT SEMICOLON { printf("exit;\n"); };
+
+stmt:	DO OPENBRACE NUMBER CLOSEBRACE { printf("\n/do 0 store\n{\n /do do 1 add store\ndo %d gt { exit } if\n", $3); }
+		block { printf("} loop\n"); };
+
+whilec:	WHILE OPENBRACE { printf("\n{\n"); }
+		bool CLOSEBRACE { printf("{ } { exit } ifelse\n"); }
+		block { printf("} loop\n"); };
+
+forc:	FOR OPENBRACE var { printf("{\n"); }
+		SEMICOLON bool SEMICOLON { printf("{ } { exit } ifelse\n"); }
+		var CLOSEBRACE block { printf("} loop\n"); };
+
+stmt: whilec
+	| forc;
+
 %%
 
 int yyerror(char *str)
 {
-	fprintf(stderr,"BISON ERROR: %s\n",str);
+	fprintf(stderr,"BRUSHC: %s in line %d\n", str, line);
 	return 0;
 }
 
 int main(void)
 {
+	yydebug = 0;
 	yyparse();
 	return 0;
 }

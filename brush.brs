@@ -6,6 +6,26 @@
 // Copyright © 2013 Delivery Studios. All rights reserved.
 //
 
+5 > y;
+// global variable a
+100 > a;
+0 > b;
+
+from b,y to a,y;
+
+for (15 > i; i >> 10; i - 1 > i)
+{
+	y + 5 > y;
+	// local variable a
+	200 :> a;
+	50 > b;
+	from b,y to a,y;
+}
+
+y + 5 > y;
+
+from b,y to a,y;
+
 // save a color with a name
 saveColor(0, 110, 160) > blue;
 // save brushes that contain colors and sizes

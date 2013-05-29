@@ -12,7 +12,7 @@ typedef struct node
 extern node *insert(char *s);
 extern node *lookup(char *s);
 extern node *delete(char *s);
-extern void scope_open(void);
-extern void scope_close(void);
+extern void openScope(void);
+extern void closeScope(void);
 
 #endif
