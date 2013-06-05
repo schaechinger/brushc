@@ -6,8 +6,8 @@
 // Copyright © 2013 Delivery Studios. All rights reserved.
 //
 
-100 > r;
-15 > c;
+57 > r;
+11 > c;
 360 / c > angle;
 400 > x;
 400 > y;
@@ -26,7 +26,7 @@ for (current > i; c >> i; i + 1 > i)
 	y > tempY;
 	
 	// switch colors
-	if (i % 4 == 0)
+	if (0 == 0)
 	{
 		useColor(red);
 	}

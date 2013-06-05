@@ -6,6 +6,16 @@
 // Copyright © 2013 Delivery Studios. All rights reserved.
 //
 
+void diagonal(a, b)
+{
+	useColor(255, 0, 0);
+	2 * a > temp;
+	from a,a to temp,temp;
+	useColor(0, 255, 0);
+	2 * b > temp;
+	from b,b to temp,temp;
+}
+
 5 > y;
 // global variable a
 100 > a;
@@ -28,6 +38,11 @@ from b,y to a,y;
 
 // save a color with a name
 saveColor(0, 110, 160) > blue;
+saveColor(240, 30, 70) > color2;
+saveColor(210, 0, 0) > red;
+
+diagonal(50, 200);
+
 // save brushes that contain colors and sizes
 saveBrush(blue, 5) > blueBrush;
 saveBrush(210, 0, 0, 15) > redBrush;

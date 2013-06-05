@@ -10,7 +10,7 @@
 
 		0
 		1234
-
+		
 * Double
 
 		0.0
@@ -26,7 +26,6 @@
 	> Save a color with it’s `rgb` values and a `name`.
 	
 		saveColor(red, green, blue) > name;
-		
 * Use color
 	> Set the `color` of the brush using a rgb color.
 	
@@ -111,7 +110,8 @@
 	
 	identifier
 	_identifier
-	myFirstIdentifier
+	myIdentifier
+	my_identifier
 	
 > Defining an identifier is like editing the current value. The identifier is defined the first time it is used.
 	
@@ -164,7 +164,22 @@
 			statement;
 		}	
 
-#### Future features
+### Procedures
+> procedures allow you to run the same code with different values for the variables
+
+	void procedureName(a, b, c)
+	{
+		statement;
+	}
+
+> call a procedure by typing it's name and the parameters
+
+	procedureName(1, 2, 3);
+
+### Methods
+> coming soon
+
+## Future features
 
 * sqrt
 
@@ -175,6 +190,3 @@
 	> Calculate the exponent of x^y
 	
 		exp (x, y)
-
-### Methods
-	

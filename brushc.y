@@ -7,7 +7,9 @@
 extern line;
 %}
 
+
 %union { int i; double d; float f; node *n; char *s; char c; }
+
 
 %token <i> NUMBER <d> DOUBLE <f> FLOAT
 %token <n> ID
@@ -16,6 +18,8 @@ extern line;
 %token EXPORTER IMPORTER
 %token DOUBLEPOINT
 %token OPENBRACE CLOSEBRACE OPENCURLYBRACE CLOSECURLYBRACE
+
+%token PROC
 
 %token PLUS MINUS MUL DIV MOD
 %token EQUALS NOT
@@ -32,111 +36,134 @@ extern line;
 %token SAVECOLOR USECOLOR USESIZE
 %token SAVEBRUSH USEBRUSH
 
+
 %%
 
-program:	header varlist stmtlist trailer ;
+
+program:	header proclist varlist stmtlist trailer ;
 header:		{ printf("%%PS-Adobe\n"); };
 trailer:	{ printf("\nshowpage\n"); };
+
+	/* create a peace of code that is enclosed by curlybraces
+	   for procedures or loops */
+block:		OPENCURLYBRACE	{ printf("1 dict begin\n"); }
+			stmts
+			CLOSECURLYBRACE	{ printf("end\n"); };
 
 stmtlist:	;
 stmtlist:	stmtlist stmt;
 
+stmts:		stmts stmt
+	|		stmt;
+
 varlist:	;
 varlist:	varlist var SEMICOLON;
 
-	/* boolean declarations */
-bool: expr IMPORTER IMPORTER expr	{ printf("lt "); }
-	| expr IMPORTER EQUALS expr		{ printf("le "); }
-	| expr EXPORTER EXPORTER expr	{ printf("gt "); }
-	| expr EXPORTER EQUALS expr		{ printf("ge "); }
-	| expr EQUALS EQUALS expr		{ printf("eq "); }
-	| expr NOT EQUALS expr			{ printf("ne "); };
+	/* declare a procedure */
+proclist:	PROC ID { printf("/%s\n{\n1 dict begin\n", $2->symbol); }
+			OPENBRACE arglist CLOSEBRACE
+			block { printf(" end } def\n"); };
 
-stmts:	stmts stmt
-	|	stmt;
+	/* a list of arguments */
+arglist:	;
+arglist:	arguments;
+arguments:	ID { printf("/%s exch def\n", $1->symbol); };
+	|		ID COMMA arguments { printf("/%s exch def\n", $1->symbol); };
 
-block:	OPENCURLYBRACE	{ printf("1 dict begin\n"); }
-		stmts
-		CLOSECURLYBRACE	{ printf("end\n"); };
+	/* call a procedure */
+stmt:	ID OPENBRACE paramlist CLOSEBRACE SEMICOLON { printf("%s\n", $1->symbol); };
+
+	/* a list of parameters */
+paramlist:	;
+paramlist:	params;
+params:		expr;
+params:		params COMMA expr
+
 
 	/* A R I T H M E T I C S */
 
-expr:	prod
-	|	div
-	|	cos
-	|	sin
-	|	tan
-	|	ln
-	|	log
-	|	floor
-	|	expr PLUS expr { printf("add "); }
-	|	expr MINUS expr { printf("sub "); }
-	|	expr MOD expr { printf("mod "); };
 
-prod:	atom;
-prod:	prod MUL atom
-		{ printf("mul "); };
+	/* boolean declarations */
+bool:		expr IMPORTER IMPORTER expr	{ printf("lt "); }
+	|		expr IMPORTER EQUALS expr	{ printf("le "); }
+	|		expr EXPORTER EXPORTER expr	{ printf("gt "); }
+	|		expr EXPORTER EQUALS expr	{ printf("ge "); }
+	|		expr EQUALS EQUALS expr		{ printf("eq "); }
+	|		expr NOT EQUALS expr		{ printf("ne "); };
 
-div:	atom DIV atom
-		{ printf("div "); };
+expr:		prod
+	|		div
+	|		cos
+	|		sin
+	|		tan
+	|		ln
+	|		log
+	|		floor
+	|		expr PLUS expr	{ printf("add "); }
+	|		expr MINUS expr	{ printf("sub "); }
+	|		expr MOD expr	{ printf("mod "); };
 
-cos:	COS atom
-		{ printf("cos "); };
+prod:		atom;
+	|		prod MUL atom	{ printf("mul "); };
 
-sin:	SIN atom
-		{ printf("sin "); };
+div:		atom DIV atom	{ printf("div "); };
 
-tan:	TAN atom
-		{ printf("tan "); };
+cos:		COS atom		{ printf("cos "); };
 
-ln:		LN atom
-		{ printf("ln "); };
+sin:		SIN atom		{ printf("sin "); };
 
-log:	LOG atom
-		{ printf("log "); };
+tan:		TAN atom		{ printf("tan "); };
 
-floor:	FLOOR atom
-		{ printf("floor "); };
+ln:			LN atom			{ printf("ln "); };
 
-atom:	NUMBER			{ printf("%d ", $1); }
-	|	MINUS NUMBER	{ printf("-%d ", $2); }
-	|	ID				{ printf("%s ", $1->symbol); }
-	|	OPENBRACE expr CLOSEBRACE;
+log:		LOG atom		{ printf("log "); };
 
-point:	expr COMMA expr;
+floor:		FLOOR atom		{ printf("floor "); };
+
+atom:		NUMBER			{ printf("%d ", $1); }
+	|		MINUS NUMBER	{ printf("-%d ", $2); }
+	|		ID				{ printf("%s ", $1->symbol); }
+	|		OPENBRACE expr CLOSEBRACE;
+
+point:		expr COMMA expr;
+
 
 	/* I D E N T I F I E R */
 
+
 	/* force new declaration of a variable
 		this is very useful for local variables */
-var:	expr DOUBLEPOINT EXPORTER ID
-		{
-			printf("/%s exch def\n", $4->symbol);
-			$4->isDeclared = 1;
-		}
+var:		expr DOUBLEPOINT EXPORTER ID
+			{
+				printf("/%s exch def\n", $4->symbol);
+				$4->isDeclared = 1;
+			}
 
 	/* stmt:	expr EXPORTER ID SEMICOLON */
-var:	expr EXPORTER
-		ID	{
-				if ($3->isDeclared == 1)
-				{
-					printf("/%s exch store\n", $3->symbol);
-				}
-				else
-				{
-					printf("/%s exch def\n", $3->symbol);
-					$3->isDeclared = 1;
-				}
-			};
+var:		expr EXPORTER
+			ID	{
+					if ($3->isDeclared == 1)
+					{
+						printf("/%s exch store\n", $3->symbol);
+					}
+					else
+					{
+						printf("/%s exch def\n", $3->symbol);
+						$3->isDeclared = 1;
+					}
+				};
 
-stmt: var SEMICOLON;
+stmt:		var SEMICOLON;
 
 	/* C O L O R */
 
-stmt:	SAVECOLOR OPENBRACE
-		NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE
-		EXPORTER ID SEMICOLON
-		{ printf("/%s { %f %f %f setrgbcolor } def\n", $10->symbol, $3 / 255.0, $5 / 255.0, $7 / 255.0); };
+stmt:		SAVECOLOR OPENBRACE
+			NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE
+			EXPORTER ID SEMICOLON
+			{
+				printf("/%s { %f %f %f setrgbcolor } def\n",
+					$10->symbol, $3 / 255.0, $5 / 255.0, $7 / 255.0);
+			};
 
 stmt:	USECOLOR OPENBRACE
 		NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE SEMICOLON
@@ -201,10 +228,10 @@ stmt:	circle;
 elsec:	;
 elsec:	ifc
 		ELSE	{ printf("\n{\n"); }
-		elsec	{ printf("} ifelse"); }
+		elsec	{ printf("} ifelse\n"); }
 	|	ifc
 		ELSE	{ printf("\n{\n"); }
-		block	{ printf("} ifelse"); };
+		block	{ printf("} ifelse\n"); };
 
 ifc:	IF
 		OPENBRACE bool CLOSEBRACE { printf("\n{\n"); }
@@ -230,8 +257,8 @@ forc:	FOR OPENBRACE var { printf("{\n"); }
 		SEMICOLON bool SEMICOLON { printf("{ } { exit } ifelse\n"); }
 		var CLOSEBRACE block { printf("} loop\n"); };
 
-stmt: whilec
-	| forc;
+stmt:	whilec
+	|	forc;
 
 %%
 

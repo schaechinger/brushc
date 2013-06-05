@@ -38,6 +38,8 @@ circle					return CIRCLE;
 \=						return EQUALS;
 \!						return NOT;
 
+void					return PROC;
+
 	/* A R I T H M E T I C S */
 
 \+						return PLUS;

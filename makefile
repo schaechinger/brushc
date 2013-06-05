@@ -28,7 +28,7 @@ brush.ps: brush.brs brushc
 	./brushc < brush.brs > brush.ps
 
 test.ps: test.brs brushc
-	./brushc <test.brs > test.ps
+	./brushc < test.brs > test.ps
 
 clean:
-	rm -f lex.yy.c brushc.tab.* brushc *.ps
+	rm -f lex.yy.c brushc.tab.* brushc *.ps *.output
