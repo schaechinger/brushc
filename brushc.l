@@ -13,7 +13,9 @@ INT						0|[1-9][0-9]*
 DOUBLE					[INT]"."[0-9]+
 FLOAT					[DOUBLE]"f"
 
+
 %%
+
 
 {INT}					yylval.i = atoi(yytext); return NUMBER;
 {DOUBLE}				yylval.d = atof(yytext); return NUMBER;
@@ -40,7 +42,9 @@ circle					return CIRCLE;
 
 void					return PROC;
 
+
 	/* A R I T H M E T I C S */
+
 
 \+						return PLUS;
 \-						return MINUS;
@@ -69,10 +73,13 @@ for						return FOR;
 	/* Braces */
 \(						return OPENBRACE;
 \)						return CLOSEBRACE;
+	/* enter a new scope */
 \{						{
 							openScope();
 							return OPENCURLYBRACE;
 						};
+	/* leave the current scope and
+	   clear local variables */
 \}						{
 							closeScope();
 							return CLOSECURLYBRACE;
@@ -81,38 +88,46 @@ for						return FOR;
 \/\/[^\n]*				;
 \/\*([^*]|\*[^/])*\*+\/	;
 
+
 	/* B R U S H   S P E C I F I C */
 
-floor				return FLOOR;
-saveColor			return SAVECOLOR;
-useColor			return USECOLOR;
-useSize				return USESIZE;
-saveBrush			return SAVEBRUSH;
-useBrush			return USEBRUSH;
 
-\n					{
-						line++;
-						column = 1;
-					}
+floor					return FLOOR;
+saveColor				return SAVECOLOR;
+useColor				return USECOLOR;
+useSize					return USESIZE;
+saveBrush				return SAVEBRUSH;
+useBrush				return USEBRUSH;
+
+	/* update the linenumber to show
+	   better error information */
+\n						{
+							line++;
+							column = 1;
+						}
 
 	/* Cut all whilespaces and linebreaks */
-[[:space:]]			;
+[[:space:]]				;
+
 
 	/* S T R I N G S */
 
-[_a-z][a-zA-Z0-9_]*	{
-						yylval.n = lookup(yytext);
-						if (yylval.n == NULL)
-						{
-							yylval.n = insert(yytext);
+
+[_a-z][a-zA-Z0-9_]*		{
+							yylval.n = lookup(yytext);
+							if (yylval.n == NULL)
+							{
+								yylval.n = insert(yytext);
+							}
+							return ID;
 						}
-						return ID;
-					}
 
 	/* Error state */
-.					{
-						fprintf(stderr,"unexpected characted: %s at %d:%d\n",
-							yytext, line, column);
-					}
+.						{
+							fprintf(stderr,"unexpected characted: %s at %d:%d\n",
+								yytext, line, column);
+						}
+
 
 %%
+

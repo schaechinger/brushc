@@ -8,12 +8,7 @@
 
 void diagonal(a, b)
 {
-	useColor(255, 0, 0);
-	2 * a > temp;
-	from a,a to temp,temp;
-	useColor(0, 255, 0);
-	2 * b > temp;
-	from b,b to temp,temp;
+	from a,a to b,b;
 }
 
 5 > y;
@@ -38,10 +33,15 @@ from b,y to a,y;
 
 // save a color with a name
 saveColor(0, 110, 160) > blue;
-saveColor(240, 30, 70) > color2;
+saveColor(0, 250, 0) > green;
 saveColor(210, 0, 0) > red;
 
-diagonal(50, 200);
+useColor(blue);
+diagonal(0, 100);
+useColor(red);
+diagonal(100, 200);
+useColor(green);
+diagonal(200, 300);
 
 // save brushes that contain colors and sizes
 saveBrush(blue, 5) > blueBrush;

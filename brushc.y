@@ -90,7 +90,8 @@ bool:		expr IMPORTER IMPORTER expr	{ printf("lt "); }
 	|		expr EXPORTER EQUALS expr	{ printf("ge "); }
 	|		expr EQUALS EQUALS expr		{ printf("eq "); }
 	|		expr NOT EQUALS expr		{ printf("ne "); };
-
+	
+	/* expressions */
 expr:		prod
 	|		div
 	|		cos
@@ -102,29 +103,19 @@ expr:		prod
 	|		expr PLUS expr	{ printf("add "); }
 	|		expr MINUS expr	{ printf("sub "); }
 	|		expr MOD expr	{ printf("mod "); };
-
-prod:		atom;
+prod:		atom
 	|		prod MUL atom	{ printf("mul "); };
-
 div:		atom DIV atom	{ printf("div "); };
-
 cos:		COS atom		{ printf("cos "); };
-
 sin:		SIN atom		{ printf("sin "); };
-
 tan:		TAN atom		{ printf("tan "); };
-
 ln:			LN atom			{ printf("ln "); };
-
 log:		LOG atom		{ printf("log "); };
-
 floor:		FLOOR atom		{ printf("floor "); };
-
 atom:		NUMBER			{ printf("%d ", $1); }
 	|		MINUS NUMBER	{ printf("-%d ", $2); }
 	|		ID				{ printf("%s ", $1->symbol); }
 	|		OPENBRACE expr CLOSEBRACE;
-
 point:		expr COMMA expr;
 
 
@@ -155,7 +146,9 @@ var:		expr EXPORTER
 
 stmt:		var SEMICOLON;
 
+
 	/* C O L O R */
+
 
 stmt:		SAVECOLOR OPENBRACE
 			NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE
@@ -165,102 +158,122 @@ stmt:		SAVECOLOR OPENBRACE
 					$10->symbol, $3 / 255.0, $5 / 255.0, $7 / 255.0);
 			};
 
-stmt:	USECOLOR OPENBRACE
-		NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE SEMICOLON
-		{ printf("%f %f %f setrgbcolor\n", $3 / 255.0, $5 / 255.0, $7 / 255.0); };
+stmt:		USECOLOR OPENBRACE
+			NUMBER COMMA NUMBER COMMA NUMBER
+			CLOSEBRACE SEMICOLON
+			{ printf("%f %f %f setrgbcolor\n", $3 / 255.0, $5 / 255.0, $7 / 255.0); };
 
-stmt:	USECOLOR OPENBRACE ID CLOSEBRACE SEMICOLON
-		{ printf("%s\n", $3->symbol); };
+stmt:		USECOLOR OPENBRACE ID CLOSEBRACE SEMICOLON
+			{ printf("%s\n", $3->symbol); };
+
 
 	/* S I Z E */
 
-stmt:	USESIZE OPENBRACE NUMBER CLOSEBRACE SEMICOLON
-		{ printf("%d setlinewidth\n", $3); };
 
-	/* B R U S H */
+stmt:		USESIZE OPENBRACE NUMBER CLOSEBRACE SEMICOLON
+			{ printf("%d setlinewidth\n", $3); };
 
-stmt:	SAVEBRUSH OPENBRACE
-		NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE
-		EXPORTER ID SEMICOLON
-		{ printf("/%s { %f %f %f setrgbcolor\n%d setlinewidth } def\n", $12->symbol, $3 / 255.0, $5 / 255.0, $7 / 255.0, $9); };
 
-stmt:	SAVEBRUSH OPENBRACE
-		ID COMMA NUMBER CLOSEBRACE
-		EXPORTER ID SEMICOLON
-		{ printf("/%s { %s\n%d setlinewidth } def\n", $8->symbol, $3->symbol, $5); };
+	/* B R U S H   S P E C I F I C */
 
-stmt:	USEBRUSH OPENBRACE ID CLOSEBRACE SEMICOLON
-		{ printf("%s\n", $3->symbol); };
+
+stmt:		SAVEBRUSH OPENBRACE
+			NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE
+			EXPORTER ID SEMICOLON
+			{
+				printf("/%s { %f %f %f setrgbcolor\n%d setlinewidth } def\n",
+					$12->symbol, $3 / 255.0, $5 / 255.0, $7 / 255.0, $9);
+			};
+
+stmt:		SAVEBRUSH OPENBRACE
+			ID COMMA NUMBER CLOSEBRACE
+			EXPORTER ID SEMICOLON
+			{
+				printf("/%s { %s\n%d setlinewidth } def\n",
+					$8->symbol, $3->symbol, $5);
+			};
+
+stmt:		USEBRUSH OPENBRACE ID CLOSEBRACE SEMICOLON
+			{ printf("%s\n", $3->symbol); };
+
 
 	/* D R A W */
 
-stmt: 	FROM { printf("newpath\n"); }
-		point { printf(" moveto\n"); }
 
-stmt:	FILL SEMICOLON
-		{ printf(" fill\n"); };
+	/* Lines */
+stmt:	 	FROM { printf("newpath\n"); }
+			point { printf(" moveto\n"); }
+
+	/* fill structures */
+stmt:		FILL SEMICOLON
+			{ printf(" fill\n"); };
 
 	/* Absolute values */
-stmt:	TO point { printf("lineto\n"); }
-		SEMICOLON { printf("stroke\n"); };
+stmt:		TO point { printf("lineto\n"); }
+			SEMICOLON { printf("stroke\n"); };
 
-stmt:	TO point { printf("lineto\n"); };
+stmt:		TO point { printf("lineto\n"); };
 
 	/* Relative values */
-stmt:	BY point SEMICOLON
-		{ printf(" rlineto\nstroke\n"); };
+stmt:		BY point SEMICOLON
+			{ printf(" rlineto\nstroke\n"); };
 
-stmt:	BY point
-		{ printf(" rlineto\n"); };
+stmt:		BY point
+			{ printf(" rlineto\n"); };
 
 	/* Circles */
-circle:	CIRCLE point NUMBER NUMBER NUMBER
-		{ printf(" %d %d %d arc", $3, $4, $5); };
+circle:		CIRCLE point NUMBER NUMBER NUMBER
+			{ printf(" %d %d %d arc", $3, $4, $5); };
 
-stmt:	circle SEMICOLON
-		{ printf(" stroke\n"); };
+stmt:		circle SEMICOLON
+			{ printf(" stroke\n"); };
 
 	/* Ability to fill the circle */
-stmt:	circle;
+stmt:		circle;
 
-	/* Conditions */
 
-elsec:	;
-elsec:	ifc
-		ELSE	{ printf("\n{\n"); }
-		elsec	{ printf("} ifelse\n"); }
-	|	ifc
-		ELSE	{ printf("\n{\n"); }
-		block	{ printf("} ifelse\n"); };
+	/* C O N D I T I O N S   &   L O O P S */
 
-ifc:	IF
-		OPENBRACE bool CLOSEBRACE { printf("\n{\n"); }
-		block { printf("} "); };
 
-stmt:	elsec { printf("\n"); }
-	|	ifc { printf("if\n"); }
-	|	IF error { yyerror("missing '(' after 'if'"); };
+elsec:		;
+elsec:		ifc
+			ELSE	{ printf("\n{\n"); }
+			elsec	{ printf("} ifelse\n"); }
+	|		ifc
+			ELSE	{ printf("\n{\n"); }
+			block	{ printf("} ifelse\n"); };
 
-stmt:	LOOP { printf("\n{\n"); }
-		block { printf("} loop\n"); };
+ifc:		IF
+			OPENBRACE bool CLOSEBRACE { printf("\n{\n"); }
+			block { printf("} "); };
 
-stmt:	EXIT SEMICOLON { printf("exit;\n"); };
+stmt:		elsec { printf("\n"); }
+	|		ifc { printf("if\n"); }
+	|		IF error { yyerror("missing '(' after 'if'"); };
 
-stmt:	DO OPENBRACE NUMBER CLOSEBRACE { printf("\n/do 0 store\n{\n /do do 1 add store\ndo %d gt { exit } if\n", $3); }
-		block { printf("} loop\n"); };
+stmt:		LOOP { printf("\n{\n"); }
+			block { printf("} loop\n"); };
 
-whilec:	WHILE OPENBRACE { printf("\n{\n"); }
-		bool CLOSEBRACE { printf("{ } { exit } ifelse\n"); }
-		block { printf("} loop\n"); };
+stmt:		EXIT SEMICOLON { printf("exit;\n"); };
 
-forc:	FOR OPENBRACE var { printf("{\n"); }
-		SEMICOLON bool SEMICOLON { printf("{ } { exit } ifelse\n"); }
-		var CLOSEBRACE block { printf("} loop\n"); };
+stmt:		DO OPENBRACE NUMBER CLOSEBRACE
+			{ printf("\n/do 0 store\n{\n /do do 1 add store\ndo %d gt { exit } if\n", $3); }
+			block { printf("} loop\n"); };
+	
+whilec:		WHILE OPENBRACE { printf("\n{\n"); }
+			bool CLOSEBRACE { printf("{ } { exit } ifelse\n"); }
+			block { printf("} loop\n"); };
 
-stmt:	whilec
-	|	forc;
+forc:		FOR OPENBRACE var { printf("{\n"); }
+			SEMICOLON bool SEMICOLON { printf("{ } { exit } ifelse\n"); }
+			var CLOSEBRACE block { printf("} loop\n"); };
+
+stmt:		whilec
+	|		forc;
+
 
 %%
+
 
 int yyerror(char *str)
 {
