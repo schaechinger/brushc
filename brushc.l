@@ -41,6 +41,8 @@ circle					return CIRCLE;
 \!						return NOT;
 
 void					return PROC;
+func					return FUNC;
+return					return RETURN;
 
 
 	/* A R I T H M E T I C S */

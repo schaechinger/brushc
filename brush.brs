@@ -6,15 +6,35 @@
 // Copyright © 2013 Delivery Studios. All rights reserved.
 //
 
+// draw a diagonal line from a to b
 void diagonal(a, b)
 {
-	from a,a to b,b;
+	if (a >> b)
+	{
+		from a,a to b,b;
+	}
+	else
+	{
+		from b,b to a,a;
+	}
 }
 
-5 > y;
-// global variable a
+/*
+func double(a)
+{
+	0 > b;
+	if (a >> 0)
+	{
+		2 * a > b;
+	}
+	return b;
+}
+*/
+
+// global variables
 100 > a;
 0 > b;
+5 > y;
 
 from b,y to a,y;
 
@@ -33,15 +53,8 @@ from b,y to a,y;
 
 // save a color with a name
 saveColor(0, 110, 160) > blue;
-saveColor(0, 250, 0) > green;
-saveColor(210, 0, 0) > red;
 
-useColor(blue);
-diagonal(0, 100);
-useColor(red);
-diagonal(100, 200);
-useColor(green);
-diagonal(200, 300);
+diagonal(100, 300);
 
 // save brushes that contain colors and sizes
 saveBrush(blue, 5) > blueBrush;

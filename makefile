@@ -12,6 +12,9 @@ all: brushc brush.ps
 test: brushc test.ps
 	open test.ps &
 
+dragon: brushc dragon.ps
+	open dragon.ps &
+
 lex.yy.c: brushc.l
 	flex brushc.l
 
@@ -29,6 +32,9 @@ brush.ps: brush.brs brushc
 
 test.ps: test.brs brushc
 	./brushc < test.brs > test.ps
+
+dragon.ps: dragon.brs brushc
+	./brushc < dragon.brs > dragon.ps
 
 clean:
 	rm -f lex.yy.c brushc.tab.* brushc *.ps *.output

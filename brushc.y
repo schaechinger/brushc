@@ -19,7 +19,7 @@ extern line;
 %token DOUBLEPOINT
 %token OPENBRACE CLOSEBRACE OPENCURLYBRACE CLOSECURLYBRACE
 
-%token PROC
+%token PROC FUNC RETURN
 
 %token PLUS MINUS MUL DIV MOD
 %token EQUALS NOT
@@ -40,7 +40,7 @@ extern line;
 %%
 
 
-program:	header proclist varlist stmtlist trailer ;
+program:	header proclist stmtlist trailer ;
 header:		{ printf("%%PS-Adobe\n"); };
 trailer:	{ printf("\nshowpage\n"); };
 
@@ -48,6 +48,10 @@ trailer:	{ printf("\nshowpage\n"); };
 	   for procedures or loops */
 block:		OPENCURLYBRACE	{ printf("1 dict begin\n"); }
 			stmts
+			CLOSECURLYBRACE	{ printf("end\n"); };
+block:		OPENCURLYBRACE	{ printf("1 dict begin\n"); }
+			stmts
+			RETURN expr SEMICOLON
 			CLOSECURLYBRACE	{ printf("end\n"); };
 
 stmtlist:	;
@@ -59,8 +63,16 @@ stmts:		stmts stmt
 varlist:	;
 varlist:	varlist var SEMICOLON;
 
+proclist:	;
+proclist:	proclist proc;
+
 	/* declare a procedure */
-proclist:	PROC ID { printf("/%s\n{\n1 dict begin\n", $2->symbol); }
+proc:		PROC ID { printf("/%s\n{\n1 dict begin\n", $2->symbol); }
+			OPENBRACE arglist CLOSEBRACE
+			block { printf(" end } def\n"); };
+
+	/* declare a function */
+func:		FUNC ID { printf/"/%s\n{\n1 dict begin\n", $2->symbol); }
 			OPENBRACE arglist CLOSEBRACE
 			block { printf(" end } def\n"); };
 
@@ -130,7 +142,6 @@ var:		expr DOUBLEPOINT EXPORTER ID
 				$4->isDeclared = 1;
 			}
 
-	/* stmt:	expr EXPORTER ID SEMICOLON */
 var:		expr EXPORTER
 			ID	{
 					if ($3->isDeclared == 1)
@@ -145,6 +156,7 @@ var:		expr EXPORTER
 				};
 
 stmt:		var SEMICOLON;
+stmt:		proc SEMICOLON;
 
 
 	/* C O L O R */
@@ -170,8 +182,8 @@ stmt:		USECOLOR OPENBRACE ID CLOSEBRACE SEMICOLON
 	/* S I Z E */
 
 
-stmt:		USESIZE OPENBRACE NUMBER CLOSEBRACE SEMICOLON
-			{ printf("%d setlinewidth\n", $3); };
+stmt:		USESIZE OPENBRACE expr CLOSEBRACE SEMICOLON
+			{ printf("setlinewidth\n"); };
 
 
 	/* B R U S H   S P E C I F I C */
@@ -211,23 +223,19 @@ stmt:		FILL SEMICOLON
 	/* Absolute values */
 stmt:		TO point { printf("lineto\n"); }
 			SEMICOLON { printf("stroke\n"); };
-
 stmt:		TO point { printf("lineto\n"); };
 
 	/* Relative values */
 stmt:		BY point SEMICOLON
 			{ printf(" rlineto\nstroke\n"); };
-
 stmt:		BY point
 			{ printf(" rlineto\n"); };
 
 	/* Circles */
 circle:		CIRCLE point NUMBER NUMBER NUMBER
 			{ printf(" %d %d %d arc", $3, $4, $5); };
-
 stmt:		circle SEMICOLON
 			{ printf(" stroke\n"); };
-
 	/* Ability to fill the circle */
 stmt:		circle;
 
@@ -235,6 +243,7 @@ stmt:		circle;
 	/* C O N D I T I O N S   &   L O O P S */
 
 
+	/* if */
 elsec:		;
 elsec:		ifc
 			ELSE	{ printf("\n{\n"); }
@@ -242,34 +251,35 @@ elsec:		ifc
 	|		ifc
 			ELSE	{ printf("\n{\n"); }
 			block	{ printf("} ifelse\n"); };
-
 ifc:		IF
 			OPENBRACE bool CLOSEBRACE { printf("\n{\n"); }
 			block { printf("} "); };
-
 stmt:		elsec { printf("\n"); }
 	|		ifc { printf("if\n"); }
 	|		IF error { yyerror("missing '(' after 'if'"); };
 
+	/* loop */
 stmt:		LOOP { printf("\n{\n"); }
 			block { printf("} loop\n"); };
-
+	/* exit */
 stmt:		EXIT SEMICOLON { printf("exit;\n"); };
 
+	/* do */
 stmt:		DO OPENBRACE NUMBER CLOSEBRACE
 			{ printf("\n/do 0 store\n{\n /do do 1 add store\ndo %d gt { exit } if\n", $3); }
 			block { printf("} loop\n"); };
-	
+
+	/* while */
 whilec:		WHILE OPENBRACE { printf("\n{\n"); }
 			bool CLOSEBRACE { printf("{ } { exit } ifelse\n"); }
 			block { printf("} loop\n"); };
+stmt:		whilec
 
+	/* for */
 forc:		FOR OPENBRACE var { printf("{\n"); }
 			SEMICOLON bool SEMICOLON { printf("{ } { exit } ifelse\n"); }
 			var CLOSEBRACE block { printf("} loop\n"); };
-
-stmt:		whilec
-	|		forc;
+stmt:		forc;
 
 
 %%

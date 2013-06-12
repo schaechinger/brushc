@@ -1,25 +1,46 @@
+Useless nonterminals
+
+   varlist
+   func
+   @4
+
+
 Terminals which are not used
 
    DOUBLE
    FLOAT
+   FUNC
 
 
-State 7 conflicts: 10 shift/reduce
-State 19 conflicts: 26 shift/reduce, 1 reduce/reduce
-State 101 conflicts: 3 shift/reduce
-State 102 conflicts: 3 shift/reduce
-State 103 conflicts: 3 shift/reduce
-State 130 conflicts: 1 shift/reduce
-State 137 conflicts: 1 shift/reduce
-State 146 conflicts: 26 shift/reduce
-State 171 conflicts: 27 shift/reduce
+Useless rules
+
+  101 varlist: /* empty */
+  102        | varlist var SEMICOLON
+
+  103 @4: /* empty */
+
+  104 func: FUNC ID @4 OPENBRACE arglist CLOSEBRACE block
+
+
+State 4 conflicts: 1 shift/reduce
+State 6 conflicts: 27 shift/reduce, 1 reduce/reduce
+State 107 conflicts: 27 reduce/reduce
+State 120 conflicts: 3 shift/reduce
+State 121 conflicts: 3 shift/reduce
+State 122 conflicts: 3 shift/reduce
+State 125 conflicts: 1 shift/reduce
+State 132 conflicts: 1 shift/reduce
+State 141 conflicts: 27 shift/reduce
+State 142 conflicts: 27 shift/reduce
+State 170 conflicts: 28 shift/reduce
+State 172 conflicts: 28 shift/reduce
 
 
 Grammar
 
     0 $accept: program $end
 
-    1 program: header proclist varlist stmtlist trailer
+    1 program: header proclist stmtlist trailer
 
     2 header: /* empty */
 
@@ -29,292 +50,302 @@ Grammar
 
     5 block: OPENCURLYBRACE @1 stmts CLOSECURLYBRACE
 
-    6 stmtlist: /* empty */
-    7         | stmtlist stmt
+    6 @2: /* empty */
 
-    8 stmts: stmts stmt
-    9      | stmt
+    7 block: OPENCURLYBRACE @2 stmts RETURN expr SEMICOLON CLOSECURLYBRACE
 
-   10 varlist: /* empty */
-   11        | varlist var SEMICOLON
+    8 stmtlist: /* empty */
+    9         | stmtlist stmt
 
-   12 @2: /* empty */
+   10 stmts: stmts stmt
+   11      | stmt
 
-   13 proclist: PROC ID @2 OPENBRACE arglist CLOSEBRACE block
+   12 proclist: /* empty */
+   13         | proclist proc
 
-   14 arglist: /* empty */
-   15        | arguments
+   14 @3: /* empty */
 
-   16 arguments: ID
-   17          | ID COMMA arguments
+   15 proc: PROC ID @3 OPENBRACE arglist CLOSEBRACE block
 
-   18 stmt: ID OPENBRACE paramlist CLOSEBRACE SEMICOLON
+   16 arglist: /* empty */
+   17        | arguments
 
-   19 paramlist: /* empty */
-   20          | params
+   18 arguments: ID
+   19          | ID COMMA arguments
 
-   21 params: expr
-   22       | params COMMA expr
+   20 stmt: ID OPENBRACE paramlist CLOSEBRACE SEMICOLON
 
-   23 bool: expr IMPORTER IMPORTER expr
-   24     | expr IMPORTER EQUALS expr
-   25     | expr EXPORTER EXPORTER expr
-   26     | expr EXPORTER EQUALS expr
-   27     | expr EQUALS EQUALS expr
-   28     | expr NOT EQUALS expr
+   21 paramlist: /* empty */
+   22          | params
 
-   29 expr: prod
-   30     | div
-   31     | cos
-   32     | sin
-   33     | tan
-   34     | ln
-   35     | log
-   36     | floor
-   37     | expr PLUS expr
-   38     | expr MINUS expr
-   39     | expr MOD expr
+   23 params: expr
+   24       | params COMMA expr
 
-   40 prod: atom
-   41     | prod MUL atom
+   25 bool: expr IMPORTER IMPORTER expr
+   26     | expr IMPORTER EQUALS expr
+   27     | expr EXPORTER EXPORTER expr
+   28     | expr EXPORTER EQUALS expr
+   29     | expr EQUALS EQUALS expr
+   30     | expr NOT EQUALS expr
 
-   42 div: atom DIV atom
+   31 expr: prod
+   32     | div
+   33     | cos
+   34     | sin
+   35     | tan
+   36     | ln
+   37     | log
+   38     | floor
+   39     | expr PLUS expr
+   40     | expr MINUS expr
+   41     | expr MOD expr
 
-   43 cos: COS atom
+   42 prod: atom
+   43     | prod MUL atom
 
-   44 sin: SIN atom
+   44 div: atom DIV atom
 
-   45 tan: TAN atom
+   45 cos: COS atom
 
-   46 ln: LN atom
+   46 sin: SIN atom
 
-   47 log: LOG atom
+   47 tan: TAN atom
 
-   48 floor: FLOOR atom
+   48 ln: LN atom
 
-   49 atom: NUMBER
-   50     | MINUS NUMBER
-   51     | ID
-   52     | OPENBRACE expr CLOSEBRACE
+   49 log: LOG atom
 
-   53 point: expr COMMA expr
+   50 floor: FLOOR atom
 
-   54 var: expr DOUBLEPOINT EXPORTER ID
-   55    | expr EXPORTER ID
+   51 atom: NUMBER
+   52     | MINUS NUMBER
+   53     | ID
+   54     | OPENBRACE expr CLOSEBRACE
 
-   56 stmt: var SEMICOLON
-   57     | SAVECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
-   58     | USECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE SEMICOLON
-   59     | USECOLOR OPENBRACE ID CLOSEBRACE SEMICOLON
-   60     | USESIZE OPENBRACE NUMBER CLOSEBRACE SEMICOLON
-   61     | SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
-   62     | SAVEBRUSH OPENBRACE ID COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
-   63     | USEBRUSH OPENBRACE ID CLOSEBRACE SEMICOLON
+   55 point: expr COMMA expr
 
-   64 @3: /* empty */
+   56 var: expr DOUBLEPOINT EXPORTER ID
+   57    | expr EXPORTER ID
 
-   65 stmt: FROM @3 point
-   66     | FILL SEMICOLON
+   58 stmt: var SEMICOLON
+   59     | proc SEMICOLON
+   60     | SAVECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+   61     | USECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE SEMICOLON
+   62     | USECOLOR OPENBRACE ID CLOSEBRACE SEMICOLON
+   63     | USESIZE OPENBRACE expr CLOSEBRACE SEMICOLON
+   64     | SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+   65     | SAVEBRUSH OPENBRACE ID COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+   66     | USEBRUSH OPENBRACE ID CLOSEBRACE SEMICOLON
 
-   67 @4: /* empty */
+   67 @5: /* empty */
 
-   68 stmt: TO point @4 SEMICOLON
-   69     | TO point
-   70     | BY point SEMICOLON
-   71     | BY point
+   68 stmt: FROM @5 point
+   69     | FILL SEMICOLON
 
-   72 circle: CIRCLE point NUMBER NUMBER NUMBER
+   70 @6: /* empty */
 
-   73 stmt: circle SEMICOLON
-   74     | circle
+   71 stmt: TO point @6 SEMICOLON
+   72     | TO point
+   73     | BY point SEMICOLON
+   74     | BY point
 
-   75 elsec: /* empty */
+   75 circle: CIRCLE point NUMBER NUMBER NUMBER
 
-   76 @5: /* empty */
+   76 stmt: circle SEMICOLON
+   77     | circle
 
-   77 elsec: ifc ELSE @5 elsec
+   78 elsec: /* empty */
 
-   78 @6: /* empty */
+   79 @7: /* empty */
 
-   79 elsec: ifc ELSE @6 block
+   80 elsec: ifc ELSE @7 elsec
 
-   80 @7: /* empty */
+   81 @8: /* empty */
 
-   81 ifc: IF OPENBRACE bool CLOSEBRACE @7 block
+   82 elsec: ifc ELSE @8 block
 
-   82 stmt: elsec
-   83     | ifc
-   84     | IF error
+   83 @9: /* empty */
 
-   85 @8: /* empty */
+   84 ifc: IF OPENBRACE bool CLOSEBRACE @9 block
 
-   86 stmt: LOOP @8 block
-   87     | EXIT SEMICOLON
+   85 stmt: elsec
+   86     | ifc
+   87     | IF error
 
-   88 @9: /* empty */
+   88 @10: /* empty */
 
-   89 stmt: DO OPENBRACE NUMBER CLOSEBRACE @9 block
-
-   90 @10: /* empty */
+   89 stmt: LOOP @10 block
+   90     | EXIT SEMICOLON
 
    91 @11: /* empty */
 
-   92 whilec: WHILE OPENBRACE @10 bool CLOSEBRACE @11 block
+   92 stmt: DO OPENBRACE NUMBER CLOSEBRACE @11 block
 
    93 @12: /* empty */
 
    94 @13: /* empty */
 
-   95 forc: FOR OPENBRACE var @12 SEMICOLON bool SEMICOLON @13 var CLOSEBRACE block
+   95 whilec: WHILE OPENBRACE @12 bool CLOSEBRACE @13 block
 
    96 stmt: whilec
-   97     | forc
+
+   97 @14: /* empty */
+
+   98 @15: /* empty */
+
+   99 forc: FOR OPENBRACE var @14 SEMICOLON bool SEMICOLON @15 var CLOSEBRACE block
+
+  100 stmt: forc
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
-error (256) 84
-NUMBER (258) 49 50 57 58 60 61 62 72 89
+error (256) 87
+NUMBER (258) 51 52 60 61 64 65 75 92
 DOUBLE (259)
 FLOAT (260)
-ID (261) 13 16 17 18 51 54 55 57 59 61 62 63
-COMMA (262) 17 22 53 57 58 61 62
-SEMICOLON (263) 11 18 56 57 58 59 60 61 62 63 66 68 70 73 87 95
-EXPORTER (264) 25 26 54 55 57 61 62
-IMPORTER (265) 23 24
-DOUBLEPOINT (266) 54
-OPENBRACE (267) 13 18 52 57 58 59 60 61 62 63 81 89 92 95
-CLOSEBRACE (268) 13 18 52 57 58 59 60 61 62 63 81 89 92 95
-OPENCURLYBRACE (269) 5
-CLOSECURLYBRACE (270) 5
-PROC (271) 13
-PLUS (272) 37
-MINUS (273) 38 50
-MUL (274) 41
-DIV (275) 42
-MOD (276) 39
-EQUALS (277) 24 26 27 28
-NOT (278) 28
-COS (279) 43
-SIN (280) 44
-TAN (281) 45
-LOG (282) 47
-LN (283) 46
-BY (284) 70 71
-FROM (285) 65
-TO (286) 68 69
-FILL (287) 66
-CIRCLE (288) 72
-FLOOR (289) 48
-IF (290) 81 84
-ELSE (291) 77 79
-WHILE (292) 92
-LOOP (293) 86
-EXIT (294) 87
-DO (295) 89
-FOR (296) 95
-SAVECOLOR (297) 57
-USECOLOR (298) 58 59
-USESIZE (299) 60
-SAVEBRUSH (300) 61 62
-USEBRUSH (301) 63
+ID (261) 15 18 19 20 53 56 57 60 62 64 65 66
+COMMA (262) 19 24 55 60 61 64 65
+SEMICOLON (263) 7 20 58 59 60 61 62 63 64 65 66 69 71 73 76 90 99
+EXPORTER (264) 27 28 56 57 60 64 65
+IMPORTER (265) 25 26
+DOUBLEPOINT (266) 56
+OPENBRACE (267) 15 20 54 60 61 62 63 64 65 66 84 92 95 99
+CLOSEBRACE (268) 15 20 54 60 61 62 63 64 65 66 84 92 95 99
+OPENCURLYBRACE (269) 5 7
+CLOSECURLYBRACE (270) 5 7
+PROC (271) 15
+FUNC (272)
+RETURN (273) 7
+PLUS (274) 39
+MINUS (275) 40 52
+MUL (276) 43
+DIV (277) 44
+MOD (278) 41
+EQUALS (279) 26 28 29 30
+NOT (280) 30
+COS (281) 45
+SIN (282) 46
+TAN (283) 47
+LOG (284) 49
+LN (285) 48
+BY (286) 73 74
+FROM (287) 68
+TO (288) 71 72
+FILL (289) 69
+CIRCLE (290) 75
+FLOOR (291) 50
+IF (292) 84 87
+ELSE (293) 80 82
+WHILE (294) 95
+LOOP (295) 89
+EXIT (296) 90
+DO (297) 92
+FOR (298) 99
+SAVECOLOR (299) 60
+USECOLOR (300) 61 62
+USESIZE (301) 63
+SAVEBRUSH (302) 64 65
+USEBRUSH (303) 66
 
 
 Nonterminals, with rules where they appear
 
-$accept (47)
+$accept (49)
     on left: 0
-program (48)
+program (50)
     on left: 1, on right: 0
-header (49)
+header (51)
     on left: 2, on right: 1
-trailer (50)
+trailer (52)
     on left: 3, on right: 1
-block (51)
-    on left: 5, on right: 13 79 81 86 89 92 95
-@1 (52)
+block (53)
+    on left: 5 7, on right: 15 82 84 89 92 95 99
+@1 (54)
     on left: 4, on right: 5
-stmtlist (53)
-    on left: 6 7, on right: 1 7
-stmts (54)
-    on left: 8 9, on right: 5 8
-varlist (55)
-    on left: 10 11, on right: 1 11
-proclist (56)
-    on left: 13, on right: 1
-@2 (57)
-    on left: 12, on right: 13
-arglist (58)
-    on left: 14 15, on right: 13
-arguments (59)
-    on left: 16 17, on right: 15 17
-stmt (60)
-    on left: 18 56 57 58 59 60 61 62 63 65 66 68 69 70 71 73 74 82
-    83 84 86 87 89 96 97, on right: 7 8 9
-paramlist (61)
-    on left: 19 20, on right: 18
-params (62)
-    on left: 21 22, on right: 20 22
-bool (63)
-    on left: 23 24 25 26 27 28, on right: 81 92 95
-expr (64)
-    on left: 29 30 31 32 33 34 35 36 37 38 39, on right: 21 22 23 24
-    25 26 27 28 37 38 39 52 53 54 55
-prod (65)
-    on left: 40 41, on right: 29 41
-div (66)
-    on left: 42, on right: 30
-cos (67)
-    on left: 43, on right: 31
-sin (68)
+@2 (55)
+    on left: 6, on right: 7
+stmtlist (56)
+    on left: 8 9, on right: 1 9
+stmts (57)
+    on left: 10 11, on right: 5 7 10
+proclist (58)
+    on left: 12 13, on right: 1 13
+proc (59)
+    on left: 15, on right: 13 59
+@3 (60)
+    on left: 14, on right: 15
+arglist (61)
+    on left: 16 17, on right: 15
+arguments (62)
+    on left: 18 19, on right: 17 19
+stmt (63)
+    on left: 20 58 59 60 61 62 63 64 65 66 68 69 71 72 73 74 76 77
+    85 86 87 89 90 92 96 100, on right: 9 10 11
+paramlist (64)
+    on left: 21 22, on right: 20
+params (65)
+    on left: 23 24, on right: 22 24
+bool (66)
+    on left: 25 26 27 28 29 30, on right: 84 95 99
+expr (67)
+    on left: 31 32 33 34 35 36 37 38 39 40 41, on right: 7 23 24 25
+    26 27 28 29 30 39 40 41 54 55 56 57 63
+prod (68)
+    on left: 42 43, on right: 31 43
+div (69)
     on left: 44, on right: 32
-tan (69)
+cos (70)
     on left: 45, on right: 33
-ln (70)
+sin (71)
     on left: 46, on right: 34
-log (71)
+tan (72)
     on left: 47, on right: 35
-floor (72)
+ln (73)
     on left: 48, on right: 36
-atom (73)
-    on left: 49 50 51 52, on right: 40 41 42 43 44 45 46 47 48
-point (74)
-    on left: 53, on right: 65 68 69 70 71 72
-var (75)
-    on left: 54 55, on right: 11 56 95
-@3 (76)
-    on left: 64, on right: 65
-@4 (77)
+log (74)
+    on left: 49, on right: 37
+floor (75)
+    on left: 50, on right: 38
+atom (76)
+    on left: 51 52 53 54, on right: 42 43 44 45 46 47 48 49 50
+point (77)
+    on left: 55, on right: 68 71 72 73 74 75
+var (78)
+    on left: 56 57, on right: 58 99
+@5 (79)
     on left: 67, on right: 68
-circle (78)
-    on left: 72, on right: 73 74
-elsec (79)
-    on left: 75 77 79, on right: 77 82
-@5 (80)
-    on left: 76, on right: 77
-@6 (81)
-    on left: 78, on right: 79
-ifc (82)
-    on left: 81, on right: 77 79 83
+@6 (80)
+    on left: 70, on right: 71
+circle (81)
+    on left: 75, on right: 76 77
+elsec (82)
+    on left: 78 80 82, on right: 80 85
 @7 (83)
-    on left: 80, on right: 81
+    on left: 79, on right: 80
 @8 (84)
-    on left: 85, on right: 86
-@9 (85)
-    on left: 88, on right: 89
-whilec (86)
-    on left: 92, on right: 96
+    on left: 81, on right: 82
+ifc (85)
+    on left: 84, on right: 80 82 86
+@9 (86)
+    on left: 83, on right: 84
 @10 (87)
-    on left: 90, on right: 92
+    on left: 88, on right: 89
 @11 (88)
     on left: 91, on right: 92
-forc (89)
-    on left: 95, on right: 97
+whilec (89)
+    on left: 95, on right: 96
 @12 (90)
     on left: 93, on right: 95
 @13 (91)
     on left: 94, on right: 95
+forc (92)
+    on left: 99, on right: 100
+@14 (93)
+    on left: 97, on right: 99
+@15 (94)
+    on left: 98, on right: 99
 
 
 state 0
@@ -336,11 +367,11 @@ state 1
 
 state 2
 
-    1 program: header . proclist varlist stmtlist trailer
+    1 program: header . proclist stmtlist trailer
 
-    PROC  shift, and go to state 4
+    $default  reduce using rule 12 (proclist)
 
-    proclist  go to state 5
+    proclist  go to state 4
 
 
 state 3
@@ -352,98 +383,149 @@ state 3
 
 state 4
 
-   13 proclist: PROC . ID @2 OPENBRACE arglist CLOSEBRACE block
+    1 program: header proclist . stmtlist trailer
+   13 proclist: proclist . proc
 
-    ID  shift, and go to state 6
+    PROC  shift, and go to state 5
+
+    PROC      [reduce using rule 8 (stmtlist)]
+    $default  reduce using rule 8 (stmtlist)
+
+    stmtlist  go to state 6
+    proc      go to state 7
 
 
 state 5
 
-    1 program: header proclist . varlist stmtlist trailer
+   15 proc: PROC . ID @3 OPENBRACE arglist CLOSEBRACE block
 
-    $default  reduce using rule 10 (varlist)
-
-    varlist  go to state 7
+    ID  shift, and go to state 8
 
 
 state 6
 
-   13 proclist: PROC ID . @2 OPENBRACE arglist CLOSEBRACE block
+    1 program: header proclist stmtlist . trailer
+    9 stmtlist: stmtlist . stmt
 
-    $default  reduce using rule 12 (@2)
+    NUMBER     shift, and go to state 9
+    ID         shift, and go to state 10
+    OPENBRACE  shift, and go to state 11
+    PROC       shift, and go to state 5
+    MINUS      shift, and go to state 12
+    COS        shift, and go to state 13
+    SIN        shift, and go to state 14
+    TAN        shift, and go to state 15
+    LOG        shift, and go to state 16
+    LN         shift, and go to state 17
+    BY         shift, and go to state 18
+    FROM       shift, and go to state 19
+    TO         shift, and go to state 20
+    FILL       shift, and go to state 21
+    CIRCLE     shift, and go to state 22
+    FLOOR      shift, and go to state 23
+    IF         shift, and go to state 24
+    WHILE      shift, and go to state 25
+    LOOP       shift, and go to state 26
+    EXIT       shift, and go to state 27
+    DO         shift, and go to state 28
+    FOR        shift, and go to state 29
+    SAVECOLOR  shift, and go to state 30
+    USECOLOR   shift, and go to state 31
+    USESIZE    shift, and go to state 32
+    SAVEBRUSH  shift, and go to state 33
+    USEBRUSH   shift, and go to state 34
 
-    @2  go to state 8
+    $end       reduce using rule 3 (trailer)
+    $end       [reduce using rule 78 (elsec)]
+    NUMBER     [reduce using rule 78 (elsec)]
+    ID         [reduce using rule 78 (elsec)]
+    OPENBRACE  [reduce using rule 78 (elsec)]
+    PROC       [reduce using rule 78 (elsec)]
+    MINUS      [reduce using rule 78 (elsec)]
+    COS        [reduce using rule 78 (elsec)]
+    SIN        [reduce using rule 78 (elsec)]
+    TAN        [reduce using rule 78 (elsec)]
+    LOG        [reduce using rule 78 (elsec)]
+    LN         [reduce using rule 78 (elsec)]
+    BY         [reduce using rule 78 (elsec)]
+    FROM       [reduce using rule 78 (elsec)]
+    TO         [reduce using rule 78 (elsec)]
+    FILL       [reduce using rule 78 (elsec)]
+    CIRCLE     [reduce using rule 78 (elsec)]
+    FLOOR      [reduce using rule 78 (elsec)]
+    IF         [reduce using rule 78 (elsec)]
+    WHILE      [reduce using rule 78 (elsec)]
+    LOOP       [reduce using rule 78 (elsec)]
+    EXIT       [reduce using rule 78 (elsec)]
+    DO         [reduce using rule 78 (elsec)]
+    FOR        [reduce using rule 78 (elsec)]
+    SAVECOLOR  [reduce using rule 78 (elsec)]
+    USECOLOR   [reduce using rule 78 (elsec)]
+    USESIZE    [reduce using rule 78 (elsec)]
+    SAVEBRUSH  [reduce using rule 78 (elsec)]
+    USEBRUSH   [reduce using rule 78 (elsec)]
+    $default   reduce using rule 3 (trailer)
+
+    trailer  go to state 35
+    proc     go to state 36
+    stmt     go to state 37
+    expr     go to state 38
+    prod     go to state 39
+    div      go to state 40
+    cos      go to state 41
+    sin      go to state 42
+    tan      go to state 43
+    ln       go to state 44
+    log      go to state 45
+    floor    go to state 46
+    atom     go to state 47
+    var      go to state 48
+    circle   go to state 49
+    elsec    go to state 50
+    ifc      go to state 51
+    whilec   go to state 52
+    forc     go to state 53
 
 
 state 7
 
-    1 program: header proclist varlist . stmtlist trailer
-   11 varlist: varlist . var SEMICOLON
+   13 proclist: proclist proc .
 
-    NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
-    OPENBRACE  shift, and go to state 11
-    MINUS      shift, and go to state 12
-    COS        shift, and go to state 13
-    SIN        shift, and go to state 14
-    TAN        shift, and go to state 15
-    LOG        shift, and go to state 16
-    LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
-
-    NUMBER     [reduce using rule 6 (stmtlist)]
-    ID         [reduce using rule 6 (stmtlist)]
-    OPENBRACE  [reduce using rule 6 (stmtlist)]
-    MINUS      [reduce using rule 6 (stmtlist)]
-    COS        [reduce using rule 6 (stmtlist)]
-    SIN        [reduce using rule 6 (stmtlist)]
-    TAN        [reduce using rule 6 (stmtlist)]
-    LOG        [reduce using rule 6 (stmtlist)]
-    LN         [reduce using rule 6 (stmtlist)]
-    FLOOR      [reduce using rule 6 (stmtlist)]
-    $default   reduce using rule 6 (stmtlist)
-
-    stmtlist  go to state 19
-    expr      go to state 20
-    prod      go to state 21
-    div       go to state 22
-    cos       go to state 23
-    sin       go to state 24
-    tan       go to state 25
-    ln        go to state 26
-    log       go to state 27
-    floor     go to state 28
-    atom      go to state 29
-    var       go to state 30
+    $default  reduce using rule 13 (proclist)
 
 
 state 8
 
-   13 proclist: PROC ID @2 . OPENBRACE arglist CLOSEBRACE block
+   15 proc: PROC ID . @3 OPENBRACE arglist CLOSEBRACE block
 
-    OPENBRACE  shift, and go to state 31
+    $default  reduce using rule 14 (@3)
+
+    @3  go to state 54
 
 
 state 9
 
-   49 atom: NUMBER .
+   51 atom: NUMBER .
 
-    $default  reduce using rule 49 (atom)
+    $default  reduce using rule 51 (atom)
 
 
 state 10
 
-   51 atom: ID .
+   20 stmt: ID . OPENBRACE paramlist CLOSEBRACE SEMICOLON
+   53 atom: ID .
 
-    $default  reduce using rule 51 (atom)
+    OPENBRACE  shift, and go to state 55
+
+    $default  reduce using rule 53 (atom)
 
 
 state 11
 
-   52 atom: OPENBRACE . expr CLOSEBRACE
+   54 atom: OPENBRACE . expr CLOSEBRACE
 
     NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
+    ID         shift, and go to state 56
     OPENBRACE  shift, and go to state 11
     MINUS      shift, and go to state 12
     COS        shift, and go to state 13
@@ -451,624 +533,451 @@ state 11
     TAN        shift, and go to state 15
     LOG        shift, and go to state 16
     LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
+    FLOOR      shift, and go to state 23
 
-    expr   go to state 32
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
+    expr   go to state 57
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
 
 
 state 12
 
-   50 atom: MINUS . NUMBER
+   52 atom: MINUS . NUMBER
 
-    NUMBER  shift, and go to state 33
+    NUMBER  shift, and go to state 58
 
 
 state 13
 
-   43 cos: COS . atom
+   45 cos: COS . atom
 
     NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
+    ID         shift, and go to state 56
     OPENBRACE  shift, and go to state 11
     MINUS      shift, and go to state 12
 
-    atom  go to state 34
+    atom  go to state 59
 
 
 state 14
 
-   44 sin: SIN . atom
+   46 sin: SIN . atom
 
     NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
+    ID         shift, and go to state 56
     OPENBRACE  shift, and go to state 11
     MINUS      shift, and go to state 12
 
-    atom  go to state 35
+    atom  go to state 60
 
 
 state 15
 
-   45 tan: TAN . atom
+   47 tan: TAN . atom
 
     NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
+    ID         shift, and go to state 56
     OPENBRACE  shift, and go to state 11
     MINUS      shift, and go to state 12
 
-    atom  go to state 36
+    atom  go to state 61
 
 
 state 16
 
-   47 log: LOG . atom
+   49 log: LOG . atom
 
     NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
+    ID         shift, and go to state 56
     OPENBRACE  shift, and go to state 11
     MINUS      shift, and go to state 12
 
-    atom  go to state 37
+    atom  go to state 62
 
 
 state 17
 
-   46 ln: LN . atom
+   48 ln: LN . atom
 
     NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
+    ID         shift, and go to state 56
     OPENBRACE  shift, and go to state 11
     MINUS      shift, and go to state 12
 
-    atom  go to state 38
+    atom  go to state 63
 
 
 state 18
 
-   48 floor: FLOOR . atom
+   73 stmt: BY . point SEMICOLON
+   74     | BY . point
 
     NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
+    ID         shift, and go to state 56
     OPENBRACE  shift, and go to state 11
     MINUS      shift, and go to state 12
+    COS        shift, and go to state 13
+    SIN        shift, and go to state 14
+    TAN        shift, and go to state 15
+    LOG        shift, and go to state 16
+    LN         shift, and go to state 17
+    FLOOR      shift, and go to state 23
 
-    atom  go to state 39
+    expr   go to state 64
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
+    point  go to state 65
 
 
 state 19
 
-    1 program: header proclist varlist stmtlist . trailer
-    7 stmtlist: stmtlist . stmt
+   68 stmt: FROM . @5 point
 
-    NUMBER     shift, and go to state 9
-    ID         shift, and go to state 40
-    OPENBRACE  shift, and go to state 11
-    MINUS      shift, and go to state 12
-    COS        shift, and go to state 13
-    SIN        shift, and go to state 14
-    TAN        shift, and go to state 15
-    LOG        shift, and go to state 16
-    LN         shift, and go to state 17
-    BY         shift, and go to state 41
-    FROM       shift, and go to state 42
-    TO         shift, and go to state 43
-    FILL       shift, and go to state 44
-    CIRCLE     shift, and go to state 45
-    FLOOR      shift, and go to state 18
-    IF         shift, and go to state 46
-    WHILE      shift, and go to state 47
-    LOOP       shift, and go to state 48
-    EXIT       shift, and go to state 49
-    DO         shift, and go to state 50
-    FOR        shift, and go to state 51
-    SAVECOLOR  shift, and go to state 52
-    USECOLOR   shift, and go to state 53
-    USESIZE    shift, and go to state 54
-    SAVEBRUSH  shift, and go to state 55
-    USEBRUSH   shift, and go to state 56
+    $default  reduce using rule 67 (@5)
 
-    $end       reduce using rule 3 (trailer)
-    $end       [reduce using rule 75 (elsec)]
-    NUMBER     [reduce using rule 75 (elsec)]
-    ID         [reduce using rule 75 (elsec)]
-    OPENBRACE  [reduce using rule 75 (elsec)]
-    MINUS      [reduce using rule 75 (elsec)]
-    COS        [reduce using rule 75 (elsec)]
-    SIN        [reduce using rule 75 (elsec)]
-    TAN        [reduce using rule 75 (elsec)]
-    LOG        [reduce using rule 75 (elsec)]
-    LN         [reduce using rule 75 (elsec)]
-    BY         [reduce using rule 75 (elsec)]
-    FROM       [reduce using rule 75 (elsec)]
-    TO         [reduce using rule 75 (elsec)]
-    FILL       [reduce using rule 75 (elsec)]
-    CIRCLE     [reduce using rule 75 (elsec)]
-    FLOOR      [reduce using rule 75 (elsec)]
-    IF         [reduce using rule 75 (elsec)]
-    WHILE      [reduce using rule 75 (elsec)]
-    LOOP       [reduce using rule 75 (elsec)]
-    EXIT       [reduce using rule 75 (elsec)]
-    DO         [reduce using rule 75 (elsec)]
-    FOR        [reduce using rule 75 (elsec)]
-    SAVECOLOR  [reduce using rule 75 (elsec)]
-    USECOLOR   [reduce using rule 75 (elsec)]
-    USESIZE    [reduce using rule 75 (elsec)]
-    SAVEBRUSH  [reduce using rule 75 (elsec)]
-    USEBRUSH   [reduce using rule 75 (elsec)]
-    $default   reduce using rule 3 (trailer)
-
-    trailer  go to state 57
-    stmt     go to state 58
-    expr     go to state 20
-    prod     go to state 21
-    div      go to state 22
-    cos      go to state 23
-    sin      go to state 24
-    tan      go to state 25
-    ln       go to state 26
-    log      go to state 27
-    floor    go to state 28
-    atom     go to state 29
-    var      go to state 59
-    circle   go to state 60
-    elsec    go to state 61
-    ifc      go to state 62
-    whilec   go to state 63
-    forc     go to state 64
+    @5  go to state 66
 
 
 state 20
 
-   37 expr: expr . PLUS expr
-   38     | expr . MINUS expr
-   39     | expr . MOD expr
-   54 var: expr . DOUBLEPOINT EXPORTER ID
-   55    | expr . EXPORTER ID
+   71 stmt: TO . point @6 SEMICOLON
+   72     | TO . point
 
-    EXPORTER     shift, and go to state 65
-    DOUBLEPOINT  shift, and go to state 66
-    PLUS         shift, and go to state 67
-    MINUS        shift, and go to state 68
-    MOD          shift, and go to state 69
+    NUMBER     shift, and go to state 9
+    ID         shift, and go to state 56
+    OPENBRACE  shift, and go to state 11
+    MINUS      shift, and go to state 12
+    COS        shift, and go to state 13
+    SIN        shift, and go to state 14
+    TAN        shift, and go to state 15
+    LOG        shift, and go to state 16
+    LN         shift, and go to state 17
+    FLOOR      shift, and go to state 23
+
+    expr   go to state 64
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
+    point  go to state 67
 
 
 state 21
 
-   29 expr: prod .
-   41 prod: prod . MUL atom
+   69 stmt: FILL . SEMICOLON
 
-    MUL  shift, and go to state 70
-
-    $default  reduce using rule 29 (expr)
+    SEMICOLON  shift, and go to state 68
 
 
 state 22
 
-   30 expr: div .
+   75 circle: CIRCLE . point NUMBER NUMBER NUMBER
 
-    $default  reduce using rule 30 (expr)
+    NUMBER     shift, and go to state 9
+    ID         shift, and go to state 56
+    OPENBRACE  shift, and go to state 11
+    MINUS      shift, and go to state 12
+    COS        shift, and go to state 13
+    SIN        shift, and go to state 14
+    TAN        shift, and go to state 15
+    LOG        shift, and go to state 16
+    LN         shift, and go to state 17
+    FLOOR      shift, and go to state 23
+
+    expr   go to state 64
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
+    point  go to state 69
 
 
 state 23
 
-   31 expr: cos .
+   50 floor: FLOOR . atom
 
-    $default  reduce using rule 31 (expr)
+    NUMBER     shift, and go to state 9
+    ID         shift, and go to state 56
+    OPENBRACE  shift, and go to state 11
+    MINUS      shift, and go to state 12
+
+    atom  go to state 70
 
 
 state 24
 
-   32 expr: sin .
+   84 ifc: IF . OPENBRACE bool CLOSEBRACE @9 block
+   87 stmt: IF . error
 
-    $default  reduce using rule 32 (expr)
+    error      shift, and go to state 71
+    OPENBRACE  shift, and go to state 72
 
 
 state 25
 
-   33 expr: tan .
+   95 whilec: WHILE . OPENBRACE @12 bool CLOSEBRACE @13 block
 
-    $default  reduce using rule 33 (expr)
+    OPENBRACE  shift, and go to state 73
 
 
 state 26
 
-   34 expr: ln .
+   89 stmt: LOOP . @10 block
 
-    $default  reduce using rule 34 (expr)
+    $default  reduce using rule 88 (@10)
+
+    @10  go to state 74
 
 
 state 27
 
-   35 expr: log .
+   90 stmt: EXIT . SEMICOLON
 
-    $default  reduce using rule 35 (expr)
+    SEMICOLON  shift, and go to state 75
 
 
 state 28
 
-   36 expr: floor .
+   92 stmt: DO . OPENBRACE NUMBER CLOSEBRACE @11 block
 
-    $default  reduce using rule 36 (expr)
+    OPENBRACE  shift, and go to state 76
 
 
 state 29
 
-   40 prod: atom .
-   42 div: atom . DIV atom
+   99 forc: FOR . OPENBRACE var @14 SEMICOLON bool SEMICOLON @15 var CLOSEBRACE block
 
-    DIV  shift, and go to state 71
-
-    $default  reduce using rule 40 (prod)
+    OPENBRACE  shift, and go to state 77
 
 
 state 30
 
-   11 varlist: varlist var . SEMICOLON
+   60 stmt: SAVECOLOR . OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
 
-    SEMICOLON  shift, and go to state 72
+    OPENBRACE  shift, and go to state 78
 
 
 state 31
 
-   13 proclist: PROC ID @2 OPENBRACE . arglist CLOSEBRACE block
+   61 stmt: USECOLOR . OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE SEMICOLON
+   62     | USECOLOR . OPENBRACE ID CLOSEBRACE SEMICOLON
 
-    ID  shift, and go to state 73
-
-    $default  reduce using rule 14 (arglist)
-
-    arglist    go to state 74
-    arguments  go to state 75
+    OPENBRACE  shift, and go to state 79
 
 
 state 32
 
-   37 expr: expr . PLUS expr
-   38     | expr . MINUS expr
-   39     | expr . MOD expr
-   52 atom: OPENBRACE expr . CLOSEBRACE
+   63 stmt: USESIZE . OPENBRACE expr CLOSEBRACE SEMICOLON
 
-    CLOSEBRACE  shift, and go to state 76
-    PLUS        shift, and go to state 67
-    MINUS       shift, and go to state 68
-    MOD         shift, and go to state 69
+    OPENBRACE  shift, and go to state 80
 
 
 state 33
 
-   50 atom: MINUS NUMBER .
+   64 stmt: SAVEBRUSH . OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+   65     | SAVEBRUSH . OPENBRACE ID COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
 
-    $default  reduce using rule 50 (atom)
+    OPENBRACE  shift, and go to state 81
 
 
 state 34
 
-   43 cos: COS atom .
+   66 stmt: USEBRUSH . OPENBRACE ID CLOSEBRACE SEMICOLON
 
-    $default  reduce using rule 43 (cos)
+    OPENBRACE  shift, and go to state 82
 
 
 state 35
 
-   44 sin: SIN atom .
-
-    $default  reduce using rule 44 (sin)
-
-
-state 36
-
-   45 tan: TAN atom .
-
-    $default  reduce using rule 45 (tan)
-
-
-state 37
-
-   47 log: LOG atom .
-
-    $default  reduce using rule 47 (log)
-
-
-state 38
-
-   46 ln: LN atom .
-
-    $default  reduce using rule 46 (ln)
-
-
-state 39
-
-   48 floor: FLOOR atom .
-
-    $default  reduce using rule 48 (floor)
-
-
-state 40
-
-   18 stmt: ID . OPENBRACE paramlist CLOSEBRACE SEMICOLON
-   51 atom: ID .
-
-    OPENBRACE  shift, and go to state 77
-
-    $default  reduce using rule 51 (atom)
-
-
-state 41
-
-   70 stmt: BY . point SEMICOLON
-   71     | BY . point
-
-    NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
-    OPENBRACE  shift, and go to state 11
-    MINUS      shift, and go to state 12
-    COS        shift, and go to state 13
-    SIN        shift, and go to state 14
-    TAN        shift, and go to state 15
-    LOG        shift, and go to state 16
-    LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
-
-    expr   go to state 78
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
-    point  go to state 79
-
-
-state 42
-
-   65 stmt: FROM . @3 point
-
-    $default  reduce using rule 64 (@3)
-
-    @3  go to state 80
-
-
-state 43
-
-   68 stmt: TO . point @4 SEMICOLON
-   69     | TO . point
-
-    NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
-    OPENBRACE  shift, and go to state 11
-    MINUS      shift, and go to state 12
-    COS        shift, and go to state 13
-    SIN        shift, and go to state 14
-    TAN        shift, and go to state 15
-    LOG        shift, and go to state 16
-    LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
-
-    expr   go to state 78
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
-    point  go to state 81
-
-
-state 44
-
-   66 stmt: FILL . SEMICOLON
-
-    SEMICOLON  shift, and go to state 82
-
-
-state 45
-
-   72 circle: CIRCLE . point NUMBER NUMBER NUMBER
-
-    NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
-    OPENBRACE  shift, and go to state 11
-    MINUS      shift, and go to state 12
-    COS        shift, and go to state 13
-    SIN        shift, and go to state 14
-    TAN        shift, and go to state 15
-    LOG        shift, and go to state 16
-    LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
-
-    expr   go to state 78
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
-    point  go to state 83
-
-
-state 46
-
-   81 ifc: IF . OPENBRACE bool CLOSEBRACE @7 block
-   84 stmt: IF . error
-
-    error      shift, and go to state 84
-    OPENBRACE  shift, and go to state 85
-
-
-state 47
-
-   92 whilec: WHILE . OPENBRACE @10 bool CLOSEBRACE @11 block
-
-    OPENBRACE  shift, and go to state 86
-
-
-state 48
-
-   86 stmt: LOOP . @8 block
-
-    $default  reduce using rule 85 (@8)
-
-    @8  go to state 87
-
-
-state 49
-
-   87 stmt: EXIT . SEMICOLON
-
-    SEMICOLON  shift, and go to state 88
-
-
-state 50
-
-   89 stmt: DO . OPENBRACE NUMBER CLOSEBRACE @9 block
-
-    OPENBRACE  shift, and go to state 89
-
-
-state 51
-
-   95 forc: FOR . OPENBRACE var @12 SEMICOLON bool SEMICOLON @13 var CLOSEBRACE block
-
-    OPENBRACE  shift, and go to state 90
-
-
-state 52
-
-   57 stmt: SAVECOLOR . OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
-
-    OPENBRACE  shift, and go to state 91
-
-
-state 53
-
-   58 stmt: USECOLOR . OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE SEMICOLON
-   59     | USECOLOR . OPENBRACE ID CLOSEBRACE SEMICOLON
-
-    OPENBRACE  shift, and go to state 92
-
-
-state 54
-
-   60 stmt: USESIZE . OPENBRACE NUMBER CLOSEBRACE SEMICOLON
-
-    OPENBRACE  shift, and go to state 93
-
-
-state 55
-
-   61 stmt: SAVEBRUSH . OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
-   62     | SAVEBRUSH . OPENBRACE ID COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
-
-    OPENBRACE  shift, and go to state 94
-
-
-state 56
-
-   63 stmt: USEBRUSH . OPENBRACE ID CLOSEBRACE SEMICOLON
-
-    OPENBRACE  shift, and go to state 95
-
-
-state 57
-
-    1 program: header proclist varlist stmtlist trailer .
+    1 program: header proclist stmtlist trailer .
 
     $default  reduce using rule 1 (program)
 
 
-state 58
+state 36
 
-    7 stmtlist: stmtlist stmt .
+   59 stmt: proc . SEMICOLON
 
-    $default  reduce using rule 7 (stmtlist)
-
-
-state 59
-
-   56 stmt: var . SEMICOLON
-
-    SEMICOLON  shift, and go to state 96
+    SEMICOLON  shift, and go to state 83
 
 
-state 60
+state 37
 
-   73 stmt: circle . SEMICOLON
-   74     | circle .
+    9 stmtlist: stmtlist stmt .
 
-    SEMICOLON  shift, and go to state 97
-
-    $default  reduce using rule 74 (stmt)
+    $default  reduce using rule 9 (stmtlist)
 
 
-state 61
+state 38
 
-   82 stmt: elsec .
+   39 expr: expr . PLUS expr
+   40     | expr . MINUS expr
+   41     | expr . MOD expr
+   56 var: expr . DOUBLEPOINT EXPORTER ID
+   57    | expr . EXPORTER ID
 
-    $default  reduce using rule 82 (stmt)
-
-
-state 62
-
-   77 elsec: ifc . ELSE @5 elsec
-   79      | ifc . ELSE @6 block
-   83 stmt: ifc .
-
-    ELSE  shift, and go to state 98
-
-    $default  reduce using rule 83 (stmt)
+    EXPORTER     shift, and go to state 84
+    DOUBLEPOINT  shift, and go to state 85
+    PLUS         shift, and go to state 86
+    MINUS        shift, and go to state 87
+    MOD          shift, and go to state 88
 
 
-state 63
+state 39
+
+   31 expr: prod .
+   43 prod: prod . MUL atom
+
+    MUL  shift, and go to state 89
+
+    $default  reduce using rule 31 (expr)
+
+
+state 40
+
+   32 expr: div .
+
+    $default  reduce using rule 32 (expr)
+
+
+state 41
+
+   33 expr: cos .
+
+    $default  reduce using rule 33 (expr)
+
+
+state 42
+
+   34 expr: sin .
+
+    $default  reduce using rule 34 (expr)
+
+
+state 43
+
+   35 expr: tan .
+
+    $default  reduce using rule 35 (expr)
+
+
+state 44
+
+   36 expr: ln .
+
+    $default  reduce using rule 36 (expr)
+
+
+state 45
+
+   37 expr: log .
+
+    $default  reduce using rule 37 (expr)
+
+
+state 46
+
+   38 expr: floor .
+
+    $default  reduce using rule 38 (expr)
+
+
+state 47
+
+   42 prod: atom .
+   44 div: atom . DIV atom
+
+    DIV  shift, and go to state 90
+
+    $default  reduce using rule 42 (prod)
+
+
+state 48
+
+   58 stmt: var . SEMICOLON
+
+    SEMICOLON  shift, and go to state 91
+
+
+state 49
+
+   76 stmt: circle . SEMICOLON
+   77     | circle .
+
+    SEMICOLON  shift, and go to state 92
+
+    $default  reduce using rule 77 (stmt)
+
+
+state 50
+
+   85 stmt: elsec .
+
+    $default  reduce using rule 85 (stmt)
+
+
+state 51
+
+   80 elsec: ifc . ELSE @7 elsec
+   82      | ifc . ELSE @8 block
+   86 stmt: ifc .
+
+    ELSE  shift, and go to state 93
+
+    $default  reduce using rule 86 (stmt)
+
+
+state 52
 
    96 stmt: whilec .
 
     $default  reduce using rule 96 (stmt)
 
 
-state 64
+state 53
 
-   97 stmt: forc .
+  100 stmt: forc .
 
-    $default  reduce using rule 97 (stmt)
-
-
-state 65
-
-   55 var: expr EXPORTER . ID
-
-    ID  shift, and go to state 99
+    $default  reduce using rule 100 (stmt)
 
 
-state 66
+state 54
 
-   54 var: expr DOUBLEPOINT . EXPORTER ID
+   15 proc: PROC ID @3 . OPENBRACE arglist CLOSEBRACE block
 
-    EXPORTER  shift, and go to state 100
+    OPENBRACE  shift, and go to state 94
 
 
-state 67
+state 55
 
-   37 expr: expr PLUS . expr
+   20 stmt: ID OPENBRACE . paramlist CLOSEBRACE SEMICOLON
 
     NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
+    ID         shift, and go to state 56
     OPENBRACE  shift, and go to state 11
     MINUS      shift, and go to state 12
     COS        shift, and go to state 13
@@ -1076,142 +985,115 @@ state 67
     TAN        shift, and go to state 15
     LOG        shift, and go to state 16
     LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
+    FLOOR      shift, and go to state 23
 
-    expr   go to state 101
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
+    $default  reduce using rule 21 (paramlist)
 
-
-state 68
-
-   38 expr: expr MINUS . expr
-
-    NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
-    OPENBRACE  shift, and go to state 11
-    MINUS      shift, and go to state 12
-    COS        shift, and go to state 13
-    SIN        shift, and go to state 14
-    TAN        shift, and go to state 15
-    LOG        shift, and go to state 16
-    LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
-
-    expr   go to state 102
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
+    paramlist  go to state 95
+    params     go to state 96
+    expr       go to state 97
+    prod       go to state 39
+    div        go to state 40
+    cos        go to state 41
+    sin        go to state 42
+    tan        go to state 43
+    ln         go to state 44
+    log        go to state 45
+    floor      go to state 46
+    atom       go to state 47
 
 
-state 69
+state 56
 
-   39 expr: expr MOD . expr
+   53 atom: ID .
 
-    NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
-    OPENBRACE  shift, and go to state 11
-    MINUS      shift, and go to state 12
-    COS        shift, and go to state 13
-    SIN        shift, and go to state 14
-    TAN        shift, and go to state 15
-    LOG        shift, and go to state 16
-    LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
-
-    expr   go to state 103
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
+    $default  reduce using rule 53 (atom)
 
 
-state 70
+state 57
 
-   41 prod: prod MUL . atom
+   39 expr: expr . PLUS expr
+   40     | expr . MINUS expr
+   41     | expr . MOD expr
+   54 atom: OPENBRACE expr . CLOSEBRACE
 
-    NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
-    OPENBRACE  shift, and go to state 11
-    MINUS      shift, and go to state 12
-
-    atom  go to state 104
-
-
-state 71
-
-   42 div: atom DIV . atom
-
-    NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
-    OPENBRACE  shift, and go to state 11
-    MINUS      shift, and go to state 12
-
-    atom  go to state 105
+    CLOSEBRACE  shift, and go to state 98
+    PLUS        shift, and go to state 86
+    MINUS       shift, and go to state 87
+    MOD         shift, and go to state 88
 
 
-state 72
+state 58
 
-   11 varlist: varlist var SEMICOLON .
-
-    $default  reduce using rule 11 (varlist)
-
-
-state 73
-
-   16 arguments: ID .
-   17          | ID . COMMA arguments
-
-    COMMA  shift, and go to state 106
-
-    $default  reduce using rule 16 (arguments)
-
-
-state 74
-
-   13 proclist: PROC ID @2 OPENBRACE arglist . CLOSEBRACE block
-
-    CLOSEBRACE  shift, and go to state 107
-
-
-state 75
-
-   15 arglist: arguments .
-
-    $default  reduce using rule 15 (arglist)
-
-
-state 76
-
-   52 atom: OPENBRACE expr CLOSEBRACE .
+   52 atom: MINUS NUMBER .
 
     $default  reduce using rule 52 (atom)
 
 
-state 77
+state 59
 
-   18 stmt: ID OPENBRACE . paramlist CLOSEBRACE SEMICOLON
+   45 cos: COS atom .
+
+    $default  reduce using rule 45 (cos)
+
+
+state 60
+
+   46 sin: SIN atom .
+
+    $default  reduce using rule 46 (sin)
+
+
+state 61
+
+   47 tan: TAN atom .
+
+    $default  reduce using rule 47 (tan)
+
+
+state 62
+
+   49 log: LOG atom .
+
+    $default  reduce using rule 49 (log)
+
+
+state 63
+
+   48 ln: LN atom .
+
+    $default  reduce using rule 48 (ln)
+
+
+state 64
+
+   39 expr: expr . PLUS expr
+   40     | expr . MINUS expr
+   41     | expr . MOD expr
+   55 point: expr . COMMA expr
+
+    COMMA  shift, and go to state 99
+    PLUS   shift, and go to state 86
+    MINUS  shift, and go to state 87
+    MOD    shift, and go to state 88
+
+
+state 65
+
+   73 stmt: BY point . SEMICOLON
+   74     | BY point .
+
+    SEMICOLON  shift, and go to state 100
+
+    $default  reduce using rule 74 (stmt)
+
+
+state 66
+
+   68 stmt: FROM @5 . point
 
     NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
+    ID         shift, and go to state 56
     OPENBRACE  shift, and go to state 11
     MINUS      shift, and go to state 12
     COS        shift, and go to state 13
@@ -1219,173 +1101,66 @@ state 77
     TAN        shift, and go to state 15
     LOG        shift, and go to state 16
     LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
+    FLOOR      shift, and go to state 23
 
-    $default  reduce using rule 19 (paramlist)
-
-    paramlist  go to state 108
-    params     go to state 109
-    expr       go to state 110
-    prod       go to state 21
-    div        go to state 22
-    cos        go to state 23
-    sin        go to state 24
-    tan        go to state 25
-    ln         go to state 26
-    log        go to state 27
-    floor      go to state 28
-    atom       go to state 29
+    expr   go to state 64
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
+    point  go to state 101
 
 
-state 78
+state 67
 
-   37 expr: expr . PLUS expr
-   38     | expr . MINUS expr
-   39     | expr . MOD expr
-   53 point: expr . COMMA expr
+   71 stmt: TO point . @6 SEMICOLON
+   72     | TO point .
 
-    COMMA  shift, and go to state 111
-    PLUS   shift, and go to state 67
-    MINUS  shift, and go to state 68
-    MOD    shift, and go to state 69
+    SEMICOLON  reduce using rule 70 (@6)
+    $default   reduce using rule 72 (stmt)
+
+    @6  go to state 102
 
 
-state 79
+state 68
 
-   70 stmt: BY point . SEMICOLON
-   71     | BY point .
+   69 stmt: FILL SEMICOLON .
 
-    SEMICOLON  shift, and go to state 112
-
-    $default  reduce using rule 71 (stmt)
+    $default  reduce using rule 69 (stmt)
 
 
-state 80
+state 69
 
-   65 stmt: FROM @3 . point
+   75 circle: CIRCLE point . NUMBER NUMBER NUMBER
 
-    NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
-    OPENBRACE  shift, and go to state 11
-    MINUS      shift, and go to state 12
-    COS        shift, and go to state 13
-    SIN        shift, and go to state 14
-    TAN        shift, and go to state 15
-    LOG        shift, and go to state 16
-    LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
-
-    expr   go to state 78
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
-    point  go to state 113
+    NUMBER  shift, and go to state 103
 
 
-state 81
+state 70
 
-   68 stmt: TO point . @4 SEMICOLON
-   69     | TO point .
+   50 floor: FLOOR atom .
 
-    SEMICOLON  reduce using rule 67 (@4)
-    $default   reduce using rule 69 (stmt)
-
-    @4  go to state 114
+    $default  reduce using rule 50 (floor)
 
 
-state 82
+state 71
 
-   66 stmt: FILL SEMICOLON .
-
-    $default  reduce using rule 66 (stmt)
-
-
-state 83
-
-   72 circle: CIRCLE point . NUMBER NUMBER NUMBER
-
-    NUMBER  shift, and go to state 115
-
-
-state 84
-
-   84 stmt: IF error .
-
-    $default  reduce using rule 84 (stmt)
-
-
-state 85
-
-   81 ifc: IF OPENBRACE . bool CLOSEBRACE @7 block
-
-    NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
-    OPENBRACE  shift, and go to state 11
-    MINUS      shift, and go to state 12
-    COS        shift, and go to state 13
-    SIN        shift, and go to state 14
-    TAN        shift, and go to state 15
-    LOG        shift, and go to state 16
-    LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
-
-    bool   go to state 116
-    expr   go to state 117
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
-
-
-state 86
-
-   92 whilec: WHILE OPENBRACE . @10 bool CLOSEBRACE @11 block
-
-    $default  reduce using rule 90 (@10)
-
-    @10  go to state 118
-
-
-state 87
-
-   86 stmt: LOOP @8 . block
-
-    OPENCURLYBRACE  shift, and go to state 119
-
-    block  go to state 120
-
-
-state 88
-
-   87 stmt: EXIT SEMICOLON .
+   87 stmt: IF error .
 
     $default  reduce using rule 87 (stmt)
 
 
-state 89
+state 72
 
-   89 stmt: DO OPENBRACE . NUMBER CLOSEBRACE @9 block
-
-    NUMBER  shift, and go to state 121
-
-
-state 90
-
-   95 forc: FOR OPENBRACE . var @12 SEMICOLON bool SEMICOLON @13 var CLOSEBRACE block
+   84 ifc: IF OPENBRACE . bool CLOSEBRACE @9 block
 
     NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
+    ID         shift, and go to state 56
     OPENBRACE  shift, and go to state 11
     MINUS      shift, and go to state 12
     COS        shift, and go to state 13
@@ -1393,144 +1168,621 @@ state 90
     TAN        shift, and go to state 15
     LOG        shift, and go to state 16
     LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
+    FLOOR      shift, and go to state 23
 
-    expr   go to state 20
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
-    var    go to state 122
+    bool   go to state 104
+    expr   go to state 105
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
+
+
+state 73
+
+   95 whilec: WHILE OPENBRACE . @12 bool CLOSEBRACE @13 block
+
+    $default  reduce using rule 93 (@12)
+
+    @12  go to state 106
+
+
+state 74
+
+   89 stmt: LOOP @10 . block
+
+    OPENCURLYBRACE  shift, and go to state 107
+
+    block  go to state 108
+
+
+state 75
+
+   90 stmt: EXIT SEMICOLON .
+
+    $default  reduce using rule 90 (stmt)
+
+
+state 76
+
+   92 stmt: DO OPENBRACE . NUMBER CLOSEBRACE @11 block
+
+    NUMBER  shift, and go to state 109
+
+
+state 77
+
+   99 forc: FOR OPENBRACE . var @14 SEMICOLON bool SEMICOLON @15 var CLOSEBRACE block
+
+    NUMBER     shift, and go to state 9
+    ID         shift, and go to state 56
+    OPENBRACE  shift, and go to state 11
+    MINUS      shift, and go to state 12
+    COS        shift, and go to state 13
+    SIN        shift, and go to state 14
+    TAN        shift, and go to state 15
+    LOG        shift, and go to state 16
+    LN         shift, and go to state 17
+    FLOOR      shift, and go to state 23
+
+    expr   go to state 38
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
+    var    go to state 110
+
+
+state 78
+
+   60 stmt: SAVECOLOR OPENBRACE . NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+
+    NUMBER  shift, and go to state 111
+
+
+state 79
+
+   61 stmt: USECOLOR OPENBRACE . NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE SEMICOLON
+   62     | USECOLOR OPENBRACE . ID CLOSEBRACE SEMICOLON
+
+    NUMBER  shift, and go to state 112
+    ID      shift, and go to state 113
+
+
+state 80
+
+   63 stmt: USESIZE OPENBRACE . expr CLOSEBRACE SEMICOLON
+
+    NUMBER     shift, and go to state 9
+    ID         shift, and go to state 56
+    OPENBRACE  shift, and go to state 11
+    MINUS      shift, and go to state 12
+    COS        shift, and go to state 13
+    SIN        shift, and go to state 14
+    TAN        shift, and go to state 15
+    LOG        shift, and go to state 16
+    LN         shift, and go to state 17
+    FLOOR      shift, and go to state 23
+
+    expr   go to state 114
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
+
+
+state 81
+
+   64 stmt: SAVEBRUSH OPENBRACE . NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+   65     | SAVEBRUSH OPENBRACE . ID COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+
+    NUMBER  shift, and go to state 115
+    ID      shift, and go to state 116
+
+
+state 82
+
+   66 stmt: USEBRUSH OPENBRACE . ID CLOSEBRACE SEMICOLON
+
+    ID  shift, and go to state 117
+
+
+state 83
+
+   59 stmt: proc SEMICOLON .
+
+    $default  reduce using rule 59 (stmt)
+
+
+state 84
+
+   57 var: expr EXPORTER . ID
+
+    ID  shift, and go to state 118
+
+
+state 85
+
+   56 var: expr DOUBLEPOINT . EXPORTER ID
+
+    EXPORTER  shift, and go to state 119
+
+
+state 86
+
+   39 expr: expr PLUS . expr
+
+    NUMBER     shift, and go to state 9
+    ID         shift, and go to state 56
+    OPENBRACE  shift, and go to state 11
+    MINUS      shift, and go to state 12
+    COS        shift, and go to state 13
+    SIN        shift, and go to state 14
+    TAN        shift, and go to state 15
+    LOG        shift, and go to state 16
+    LN         shift, and go to state 17
+    FLOOR      shift, and go to state 23
+
+    expr   go to state 120
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
+
+
+state 87
+
+   40 expr: expr MINUS . expr
+
+    NUMBER     shift, and go to state 9
+    ID         shift, and go to state 56
+    OPENBRACE  shift, and go to state 11
+    MINUS      shift, and go to state 12
+    COS        shift, and go to state 13
+    SIN        shift, and go to state 14
+    TAN        shift, and go to state 15
+    LOG        shift, and go to state 16
+    LN         shift, and go to state 17
+    FLOOR      shift, and go to state 23
+
+    expr   go to state 121
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
+
+
+state 88
+
+   41 expr: expr MOD . expr
+
+    NUMBER     shift, and go to state 9
+    ID         shift, and go to state 56
+    OPENBRACE  shift, and go to state 11
+    MINUS      shift, and go to state 12
+    COS        shift, and go to state 13
+    SIN        shift, and go to state 14
+    TAN        shift, and go to state 15
+    LOG        shift, and go to state 16
+    LN         shift, and go to state 17
+    FLOOR      shift, and go to state 23
+
+    expr   go to state 122
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
+
+
+state 89
+
+   43 prod: prod MUL . atom
+
+    NUMBER     shift, and go to state 9
+    ID         shift, and go to state 56
+    OPENBRACE  shift, and go to state 11
+    MINUS      shift, and go to state 12
+
+    atom  go to state 123
+
+
+state 90
+
+   44 div: atom DIV . atom
+
+    NUMBER     shift, and go to state 9
+    ID         shift, and go to state 56
+    OPENBRACE  shift, and go to state 11
+    MINUS      shift, and go to state 12
+
+    atom  go to state 124
 
 
 state 91
 
-   57 stmt: SAVECOLOR OPENBRACE . NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+   58 stmt: var SEMICOLON .
 
-    NUMBER  shift, and go to state 123
+    $default  reduce using rule 58 (stmt)
 
 
 state 92
 
-   58 stmt: USECOLOR OPENBRACE . NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE SEMICOLON
-   59     | USECOLOR OPENBRACE . ID CLOSEBRACE SEMICOLON
+   76 stmt: circle SEMICOLON .
 
-    NUMBER  shift, and go to state 124
-    ID      shift, and go to state 125
+    $default  reduce using rule 76 (stmt)
 
 
 state 93
 
-   60 stmt: USESIZE OPENBRACE . NUMBER CLOSEBRACE SEMICOLON
+   80 elsec: ifc ELSE . @7 elsec
+   82      | ifc ELSE . @8 block
 
-    NUMBER  shift, and go to state 126
+    OPENCURLYBRACE  reduce using rule 81 (@8)
+    $default        reduce using rule 79 (@7)
+
+    @7  go to state 125
+    @8  go to state 126
 
 
 state 94
 
-   61 stmt: SAVEBRUSH OPENBRACE . NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
-   62     | SAVEBRUSH OPENBRACE . ID COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+   15 proc: PROC ID @3 OPENBRACE . arglist CLOSEBRACE block
 
-    NUMBER  shift, and go to state 127
-    ID      shift, and go to state 128
+    ID  shift, and go to state 127
+
+    $default  reduce using rule 16 (arglist)
+
+    arglist    go to state 128
+    arguments  go to state 129
 
 
 state 95
 
-   63 stmt: USEBRUSH OPENBRACE . ID CLOSEBRACE SEMICOLON
+   20 stmt: ID OPENBRACE paramlist . CLOSEBRACE SEMICOLON
 
-    ID  shift, and go to state 129
+    CLOSEBRACE  shift, and go to state 130
 
 
 state 96
 
-   56 stmt: var SEMICOLON .
+   22 paramlist: params .
+   24 params: params . COMMA expr
 
-    $default  reduce using rule 56 (stmt)
+    COMMA  shift, and go to state 131
+
+    $default  reduce using rule 22 (paramlist)
 
 
 state 97
 
-   73 stmt: circle SEMICOLON .
+   23 params: expr .
+   39 expr: expr . PLUS expr
+   40     | expr . MINUS expr
+   41     | expr . MOD expr
 
-    $default  reduce using rule 73 (stmt)
+    PLUS   shift, and go to state 86
+    MINUS  shift, and go to state 87
+    MOD    shift, and go to state 88
+
+    $default  reduce using rule 23 (params)
 
 
 state 98
 
-   77 elsec: ifc ELSE . @5 elsec
-   79      | ifc ELSE . @6 block
+   54 atom: OPENBRACE expr CLOSEBRACE .
 
-    OPENCURLYBRACE  reduce using rule 78 (@6)
-    $default        reduce using rule 76 (@5)
-
-    @5  go to state 130
-    @6  go to state 131
+    $default  reduce using rule 54 (atom)
 
 
 state 99
 
-   55 var: expr EXPORTER ID .
+   55 point: expr COMMA . expr
 
-    $default  reduce using rule 55 (var)
+    NUMBER     shift, and go to state 9
+    ID         shift, and go to state 56
+    OPENBRACE  shift, and go to state 11
+    MINUS      shift, and go to state 12
+    COS        shift, and go to state 13
+    SIN        shift, and go to state 14
+    TAN        shift, and go to state 15
+    LOG        shift, and go to state 16
+    LN         shift, and go to state 17
+    FLOOR      shift, and go to state 23
+
+    expr   go to state 132
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
 
 
 state 100
 
-   54 var: expr DOUBLEPOINT EXPORTER . ID
+   73 stmt: BY point SEMICOLON .
 
-    ID  shift, and go to state 132
+    $default  reduce using rule 73 (stmt)
 
 
 state 101
 
-   37 expr: expr . PLUS expr
-   37     | expr PLUS expr .
-   38     | expr . MINUS expr
-   39     | expr . MOD expr
+   68 stmt: FROM @5 point .
 
-    PLUS   shift, and go to state 67
-    MINUS  shift, and go to state 68
-    MOD    shift, and go to state 69
-
-    PLUS      [reduce using rule 37 (expr)]
-    MINUS     [reduce using rule 37 (expr)]
-    MOD       [reduce using rule 37 (expr)]
-    $default  reduce using rule 37 (expr)
+    $default  reduce using rule 68 (stmt)
 
 
 state 102
 
-   37 expr: expr . PLUS expr
-   38     | expr . MINUS expr
-   38     | expr MINUS expr .
-   39     | expr . MOD expr
+   71 stmt: TO point @6 . SEMICOLON
 
-    PLUS   shift, and go to state 67
-    MINUS  shift, and go to state 68
-    MOD    shift, and go to state 69
-
-    PLUS      [reduce using rule 38 (expr)]
-    MINUS     [reduce using rule 38 (expr)]
-    MOD       [reduce using rule 38 (expr)]
-    $default  reduce using rule 38 (expr)
+    SEMICOLON  shift, and go to state 133
 
 
 state 103
 
-   37 expr: expr . PLUS expr
-   38     | expr . MINUS expr
-   39     | expr . MOD expr
-   39     | expr MOD expr .
+   75 circle: CIRCLE point NUMBER . NUMBER NUMBER
 
-    PLUS   shift, and go to state 67
-    MINUS  shift, and go to state 68
-    MOD    shift, and go to state 69
+    NUMBER  shift, and go to state 134
+
+
+state 104
+
+   84 ifc: IF OPENBRACE bool . CLOSEBRACE @9 block
+
+    CLOSEBRACE  shift, and go to state 135
+
+
+state 105
+
+   25 bool: expr . IMPORTER IMPORTER expr
+   26     | expr . IMPORTER EQUALS expr
+   27     | expr . EXPORTER EXPORTER expr
+   28     | expr . EXPORTER EQUALS expr
+   29     | expr . EQUALS EQUALS expr
+   30     | expr . NOT EQUALS expr
+   39 expr: expr . PLUS expr
+   40     | expr . MINUS expr
+   41     | expr . MOD expr
+
+    EXPORTER  shift, and go to state 136
+    IMPORTER  shift, and go to state 137
+    PLUS      shift, and go to state 86
+    MINUS     shift, and go to state 87
+    MOD       shift, and go to state 88
+    EQUALS    shift, and go to state 138
+    NOT       shift, and go to state 139
+
+
+state 106
+
+   95 whilec: WHILE OPENBRACE @12 . bool CLOSEBRACE @13 block
+
+    NUMBER     shift, and go to state 9
+    ID         shift, and go to state 56
+    OPENBRACE  shift, and go to state 11
+    MINUS      shift, and go to state 12
+    COS        shift, and go to state 13
+    SIN        shift, and go to state 14
+    TAN        shift, and go to state 15
+    LOG        shift, and go to state 16
+    LN         shift, and go to state 17
+    FLOOR      shift, and go to state 23
+
+    bool   go to state 140
+    expr   go to state 105
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
+
+
+state 107
+
+    5 block: OPENCURLYBRACE . @1 stmts CLOSECURLYBRACE
+    7      | OPENCURLYBRACE . @2 stmts RETURN expr SEMICOLON CLOSECURLYBRACE
+
+    NUMBER     reduce using rule 4 (@1)
+    NUMBER     [reduce using rule 6 (@2)]
+    ID         reduce using rule 4 (@1)
+    ID         [reduce using rule 6 (@2)]
+    OPENBRACE  reduce using rule 4 (@1)
+    OPENBRACE  [reduce using rule 6 (@2)]
+    PROC       reduce using rule 4 (@1)
+    PROC       [reduce using rule 6 (@2)]
+    RETURN     reduce using rule 6 (@2)
+    MINUS      reduce using rule 4 (@1)
+    MINUS      [reduce using rule 6 (@2)]
+    COS        reduce using rule 4 (@1)
+    COS        [reduce using rule 6 (@2)]
+    SIN        reduce using rule 4 (@1)
+    SIN        [reduce using rule 6 (@2)]
+    TAN        reduce using rule 4 (@1)
+    TAN        [reduce using rule 6 (@2)]
+    LOG        reduce using rule 4 (@1)
+    LOG        [reduce using rule 6 (@2)]
+    LN         reduce using rule 4 (@1)
+    LN         [reduce using rule 6 (@2)]
+    BY         reduce using rule 4 (@1)
+    BY         [reduce using rule 6 (@2)]
+    FROM       reduce using rule 4 (@1)
+    FROM       [reduce using rule 6 (@2)]
+    TO         reduce using rule 4 (@1)
+    TO         [reduce using rule 6 (@2)]
+    FILL       reduce using rule 4 (@1)
+    FILL       [reduce using rule 6 (@2)]
+    CIRCLE     reduce using rule 4 (@1)
+    CIRCLE     [reduce using rule 6 (@2)]
+    FLOOR      reduce using rule 4 (@1)
+    FLOOR      [reduce using rule 6 (@2)]
+    IF         reduce using rule 4 (@1)
+    IF         [reduce using rule 6 (@2)]
+    WHILE      reduce using rule 4 (@1)
+    WHILE      [reduce using rule 6 (@2)]
+    LOOP       reduce using rule 4 (@1)
+    LOOP       [reduce using rule 6 (@2)]
+    EXIT       reduce using rule 4 (@1)
+    EXIT       [reduce using rule 6 (@2)]
+    DO         reduce using rule 4 (@1)
+    DO         [reduce using rule 6 (@2)]
+    FOR        reduce using rule 4 (@1)
+    FOR        [reduce using rule 6 (@2)]
+    SAVECOLOR  reduce using rule 4 (@1)
+    SAVECOLOR  [reduce using rule 6 (@2)]
+    USECOLOR   reduce using rule 4 (@1)
+    USECOLOR   [reduce using rule 6 (@2)]
+    USESIZE    reduce using rule 4 (@1)
+    USESIZE    [reduce using rule 6 (@2)]
+    SAVEBRUSH  reduce using rule 4 (@1)
+    SAVEBRUSH  [reduce using rule 6 (@2)]
+    USEBRUSH   reduce using rule 4 (@1)
+    USEBRUSH   [reduce using rule 6 (@2)]
+    $default   reduce using rule 4 (@1)
+
+    @1  go to state 141
+    @2  go to state 142
+
+
+state 108
+
+   89 stmt: LOOP @10 block .
+
+    $default  reduce using rule 89 (stmt)
+
+
+state 109
+
+   92 stmt: DO OPENBRACE NUMBER . CLOSEBRACE @11 block
+
+    CLOSEBRACE  shift, and go to state 143
+
+
+state 110
+
+   99 forc: FOR OPENBRACE var . @14 SEMICOLON bool SEMICOLON @15 var CLOSEBRACE block
+
+    $default  reduce using rule 97 (@14)
+
+    @14  go to state 144
+
+
+state 111
+
+   60 stmt: SAVECOLOR OPENBRACE NUMBER . COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+
+    COMMA  shift, and go to state 145
+
+
+state 112
+
+   61 stmt: USECOLOR OPENBRACE NUMBER . COMMA NUMBER COMMA NUMBER CLOSEBRACE SEMICOLON
+
+    COMMA  shift, and go to state 146
+
+
+state 113
+
+   62 stmt: USECOLOR OPENBRACE ID . CLOSEBRACE SEMICOLON
+
+    CLOSEBRACE  shift, and go to state 147
+
+
+state 114
+
+   39 expr: expr . PLUS expr
+   40     | expr . MINUS expr
+   41     | expr . MOD expr
+   63 stmt: USESIZE OPENBRACE expr . CLOSEBRACE SEMICOLON
+
+    CLOSEBRACE  shift, and go to state 148
+    PLUS        shift, and go to state 86
+    MINUS       shift, and go to state 87
+    MOD         shift, and go to state 88
+
+
+state 115
+
+   64 stmt: SAVEBRUSH OPENBRACE NUMBER . COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+
+    COMMA  shift, and go to state 149
+
+
+state 116
+
+   65 stmt: SAVEBRUSH OPENBRACE ID . COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+
+    COMMA  shift, and go to state 150
+
+
+state 117
+
+   66 stmt: USEBRUSH OPENBRACE ID . CLOSEBRACE SEMICOLON
+
+    CLOSEBRACE  shift, and go to state 151
+
+
+state 118
+
+   57 var: expr EXPORTER ID .
+
+    $default  reduce using rule 57 (var)
+
+
+state 119
+
+   56 var: expr DOUBLEPOINT EXPORTER . ID
+
+    ID  shift, and go to state 152
+
+
+state 120
+
+   39 expr: expr . PLUS expr
+   39     | expr PLUS expr .
+   40     | expr . MINUS expr
+   41     | expr . MOD expr
+
+    PLUS   shift, and go to state 86
+    MINUS  shift, and go to state 87
+    MOD    shift, and go to state 88
 
     PLUS      [reduce using rule 39 (expr)]
     MINUS     [reduce using rule 39 (expr)]
@@ -1538,631 +1790,564 @@ state 103
     $default  reduce using rule 39 (expr)
 
 
-state 104
-
-   41 prod: prod MUL atom .
-
-    $default  reduce using rule 41 (prod)
-
-
-state 105
-
-   42 div: atom DIV atom .
-
-    $default  reduce using rule 42 (div)
-
-
-state 106
-
-   17 arguments: ID COMMA . arguments
-
-    ID  shift, and go to state 73
-
-    arguments  go to state 133
-
-
-state 107
-
-   13 proclist: PROC ID @2 OPENBRACE arglist CLOSEBRACE . block
-
-    OPENCURLYBRACE  shift, and go to state 119
-
-    block  go to state 134
-
-
-state 108
-
-   18 stmt: ID OPENBRACE paramlist . CLOSEBRACE SEMICOLON
-
-    CLOSEBRACE  shift, and go to state 135
-
-
-state 109
-
-   20 paramlist: params .
-   22 params: params . COMMA expr
-
-    COMMA  shift, and go to state 136
-
-    $default  reduce using rule 20 (paramlist)
-
-
-state 110
-
-   21 params: expr .
-   37 expr: expr . PLUS expr
-   38     | expr . MINUS expr
-   39     | expr . MOD expr
-
-    PLUS   shift, and go to state 67
-    MINUS  shift, and go to state 68
-    MOD    shift, and go to state 69
-
-    $default  reduce using rule 21 (params)
-
-
-state 111
-
-   53 point: expr COMMA . expr
-
-    NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
-    OPENBRACE  shift, and go to state 11
-    MINUS      shift, and go to state 12
-    COS        shift, and go to state 13
-    SIN        shift, and go to state 14
-    TAN        shift, and go to state 15
-    LOG        shift, and go to state 16
-    LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
-
-    expr   go to state 137
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
-
-
-state 112
-
-   70 stmt: BY point SEMICOLON .
-
-    $default  reduce using rule 70 (stmt)
-
-
-state 113
-
-   65 stmt: FROM @3 point .
-
-    $default  reduce using rule 65 (stmt)
-
-
-state 114
-
-   68 stmt: TO point @4 . SEMICOLON
-
-    SEMICOLON  shift, and go to state 138
-
-
-state 115
-
-   72 circle: CIRCLE point NUMBER . NUMBER NUMBER
-
-    NUMBER  shift, and go to state 139
-
-
-state 116
-
-   81 ifc: IF OPENBRACE bool . CLOSEBRACE @7 block
-
-    CLOSEBRACE  shift, and go to state 140
-
-
-state 117
-
-   23 bool: expr . IMPORTER IMPORTER expr
-   24     | expr . IMPORTER EQUALS expr
-   25     | expr . EXPORTER EXPORTER expr
-   26     | expr . EXPORTER EQUALS expr
-   27     | expr . EQUALS EQUALS expr
-   28     | expr . NOT EQUALS expr
-   37 expr: expr . PLUS expr
-   38     | expr . MINUS expr
-   39     | expr . MOD expr
-
-    EXPORTER  shift, and go to state 141
-    IMPORTER  shift, and go to state 142
-    PLUS      shift, and go to state 67
-    MINUS     shift, and go to state 68
-    MOD       shift, and go to state 69
-    EQUALS    shift, and go to state 143
-    NOT       shift, and go to state 144
-
-
-state 118
-
-   92 whilec: WHILE OPENBRACE @10 . bool CLOSEBRACE @11 block
-
-    NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
-    OPENBRACE  shift, and go to state 11
-    MINUS      shift, and go to state 12
-    COS        shift, and go to state 13
-    SIN        shift, and go to state 14
-    TAN        shift, and go to state 15
-    LOG        shift, and go to state 16
-    LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
-
-    bool   go to state 145
-    expr   go to state 117
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
-
-
-state 119
-
-    5 block: OPENCURLYBRACE . @1 stmts CLOSECURLYBRACE
-
-    $default  reduce using rule 4 (@1)
-
-    @1  go to state 146
-
-
-state 120
-
-   86 stmt: LOOP @8 block .
-
-    $default  reduce using rule 86 (stmt)
-
-
 state 121
 
-   89 stmt: DO OPENBRACE NUMBER . CLOSEBRACE @9 block
+   39 expr: expr . PLUS expr
+   40     | expr . MINUS expr
+   40     | expr MINUS expr .
+   41     | expr . MOD expr
 
-    CLOSEBRACE  shift, and go to state 147
+    PLUS   shift, and go to state 86
+    MINUS  shift, and go to state 87
+    MOD    shift, and go to state 88
+
+    PLUS      [reduce using rule 40 (expr)]
+    MINUS     [reduce using rule 40 (expr)]
+    MOD       [reduce using rule 40 (expr)]
+    $default  reduce using rule 40 (expr)
 
 
 state 122
 
-   95 forc: FOR OPENBRACE var . @12 SEMICOLON bool SEMICOLON @13 var CLOSEBRACE block
+   39 expr: expr . PLUS expr
+   40     | expr . MINUS expr
+   41     | expr . MOD expr
+   41     | expr MOD expr .
 
-    $default  reduce using rule 93 (@12)
+    PLUS   shift, and go to state 86
+    MINUS  shift, and go to state 87
+    MOD    shift, and go to state 88
 
-    @12  go to state 148
+    PLUS      [reduce using rule 41 (expr)]
+    MINUS     [reduce using rule 41 (expr)]
+    MOD       [reduce using rule 41 (expr)]
+    $default  reduce using rule 41 (expr)
 
 
 state 123
 
-   57 stmt: SAVECOLOR OPENBRACE NUMBER . COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+   43 prod: prod MUL atom .
 
-    COMMA  shift, and go to state 149
+    $default  reduce using rule 43 (prod)
 
 
 state 124
 
-   58 stmt: USECOLOR OPENBRACE NUMBER . COMMA NUMBER COMMA NUMBER CLOSEBRACE SEMICOLON
+   44 div: atom DIV atom .
 
-    COMMA  shift, and go to state 150
+    $default  reduce using rule 44 (div)
 
 
 state 125
 
-   59 stmt: USECOLOR OPENBRACE ID . CLOSEBRACE SEMICOLON
+   80 elsec: ifc ELSE @7 . elsec
 
-    CLOSEBRACE  shift, and go to state 151
+    IF  shift, and go to state 153
+
+    IF        [reduce using rule 78 (elsec)]
+    $default  reduce using rule 78 (elsec)
+
+    elsec  go to state 154
+    ifc    go to state 155
 
 
 state 126
 
-   60 stmt: USESIZE OPENBRACE NUMBER . CLOSEBRACE SEMICOLON
+   82 elsec: ifc ELSE @8 . block
 
-    CLOSEBRACE  shift, and go to state 152
+    OPENCURLYBRACE  shift, and go to state 107
+
+    block  go to state 156
 
 
 state 127
 
-   61 stmt: SAVEBRUSH OPENBRACE NUMBER . COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+   18 arguments: ID .
+   19          | ID . COMMA arguments
 
-    COMMA  shift, and go to state 153
+    COMMA  shift, and go to state 157
+
+    $default  reduce using rule 18 (arguments)
 
 
 state 128
 
-   62 stmt: SAVEBRUSH OPENBRACE ID . COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+   15 proc: PROC ID @3 OPENBRACE arglist . CLOSEBRACE block
 
-    COMMA  shift, and go to state 154
+    CLOSEBRACE  shift, and go to state 158
 
 
 state 129
 
-   63 stmt: USEBRUSH OPENBRACE ID . CLOSEBRACE SEMICOLON
+   17 arglist: arguments .
 
-    CLOSEBRACE  shift, and go to state 155
+    $default  reduce using rule 17 (arglist)
 
 
 state 130
 
-   77 elsec: ifc ELSE @5 . elsec
+   20 stmt: ID OPENBRACE paramlist CLOSEBRACE . SEMICOLON
 
-    IF  shift, and go to state 156
-
-    IF        [reduce using rule 75 (elsec)]
-    $default  reduce using rule 75 (elsec)
-
-    elsec  go to state 157
-    ifc    go to state 158
+    SEMICOLON  shift, and go to state 159
 
 
 state 131
 
-   79 elsec: ifc ELSE @6 . block
+   24 params: params COMMA . expr
 
-    OPENCURLYBRACE  shift, and go to state 119
+    NUMBER     shift, and go to state 9
+    ID         shift, and go to state 56
+    OPENBRACE  shift, and go to state 11
+    MINUS      shift, and go to state 12
+    COS        shift, and go to state 13
+    SIN        shift, and go to state 14
+    TAN        shift, and go to state 15
+    LOG        shift, and go to state 16
+    LN         shift, and go to state 17
+    FLOOR      shift, and go to state 23
 
-    block  go to state 159
+    expr   go to state 160
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
 
 
 state 132
 
-   54 var: expr DOUBLEPOINT EXPORTER ID .
+   39 expr: expr . PLUS expr
+   40     | expr . MINUS expr
+   41     | expr . MOD expr
+   55 point: expr COMMA expr .
 
-    $default  reduce using rule 54 (var)
+    PLUS   shift, and go to state 86
+    MINUS  shift, and go to state 87
+    MOD    shift, and go to state 88
+
+    MINUS     [reduce using rule 55 (point)]
+    $default  reduce using rule 55 (point)
 
 
 state 133
 
-   17 arguments: ID COMMA arguments .
+   71 stmt: TO point @6 SEMICOLON .
 
-    $default  reduce using rule 17 (arguments)
+    $default  reduce using rule 71 (stmt)
 
 
 state 134
 
-   13 proclist: PROC ID @2 OPENBRACE arglist CLOSEBRACE block .
+   75 circle: CIRCLE point NUMBER NUMBER . NUMBER
 
-    $default  reduce using rule 13 (proclist)
+    NUMBER  shift, and go to state 161
 
 
 state 135
 
-   18 stmt: ID OPENBRACE paramlist CLOSEBRACE . SEMICOLON
+   84 ifc: IF OPENBRACE bool CLOSEBRACE . @9 block
 
-    SEMICOLON  shift, and go to state 160
+    $default  reduce using rule 83 (@9)
+
+    @9  go to state 162
 
 
 state 136
 
-   22 params: params COMMA . expr
+   27 bool: expr EXPORTER . EXPORTER expr
+   28     | expr EXPORTER . EQUALS expr
 
-    NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
-    OPENBRACE  shift, and go to state 11
-    MINUS      shift, and go to state 12
-    COS        shift, and go to state 13
-    SIN        shift, and go to state 14
-    TAN        shift, and go to state 15
-    LOG        shift, and go to state 16
-    LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
-
-    expr   go to state 161
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
+    EXPORTER  shift, and go to state 163
+    EQUALS    shift, and go to state 164
 
 
 state 137
 
-   37 expr: expr . PLUS expr
-   38     | expr . MINUS expr
-   39     | expr . MOD expr
-   53 point: expr COMMA expr .
+   25 bool: expr IMPORTER . IMPORTER expr
+   26     | expr IMPORTER . EQUALS expr
 
-    PLUS   shift, and go to state 67
-    MINUS  shift, and go to state 68
-    MOD    shift, and go to state 69
-
-    MINUS     [reduce using rule 53 (point)]
-    $default  reduce using rule 53 (point)
+    IMPORTER  shift, and go to state 165
+    EQUALS    shift, and go to state 166
 
 
 state 138
 
-   68 stmt: TO point @4 SEMICOLON .
+   29 bool: expr EQUALS . EQUALS expr
 
-    $default  reduce using rule 68 (stmt)
+    EQUALS  shift, and go to state 167
 
 
 state 139
 
-   72 circle: CIRCLE point NUMBER NUMBER . NUMBER
-
-    NUMBER  shift, and go to state 162
-
-
-state 140
-
-   81 ifc: IF OPENBRACE bool CLOSEBRACE . @7 block
-
-    $default  reduce using rule 80 (@7)
-
-    @7  go to state 163
-
-
-state 141
-
-   25 bool: expr EXPORTER . EXPORTER expr
-   26     | expr EXPORTER . EQUALS expr
-
-    EXPORTER  shift, and go to state 164
-    EQUALS    shift, and go to state 165
-
-
-state 142
-
-   23 bool: expr IMPORTER . IMPORTER expr
-   24     | expr IMPORTER . EQUALS expr
-
-    IMPORTER  shift, and go to state 166
-    EQUALS    shift, and go to state 167
-
-
-state 143
-
-   27 bool: expr EQUALS . EQUALS expr
+   30 bool: expr NOT . EQUALS expr
 
     EQUALS  shift, and go to state 168
 
 
-state 144
+state 140
 
-   28 bool: expr NOT . EQUALS expr
+   95 whilec: WHILE OPENBRACE @12 bool . CLOSEBRACE @13 block
 
-    EQUALS  shift, and go to state 169
-
-
-state 145
-
-   92 whilec: WHILE OPENBRACE @10 bool . CLOSEBRACE @11 block
-
-    CLOSEBRACE  shift, and go to state 170
+    CLOSEBRACE  shift, and go to state 169
 
 
-state 146
+state 141
 
     5 block: OPENCURLYBRACE @1 . stmts CLOSECURLYBRACE
 
     NUMBER     shift, and go to state 9
-    ID         shift, and go to state 40
+    ID         shift, and go to state 10
     OPENBRACE  shift, and go to state 11
+    PROC       shift, and go to state 5
     MINUS      shift, and go to state 12
     COS        shift, and go to state 13
     SIN        shift, and go to state 14
     TAN        shift, and go to state 15
     LOG        shift, and go to state 16
     LN         shift, and go to state 17
-    BY         shift, and go to state 41
-    FROM       shift, and go to state 42
-    TO         shift, and go to state 43
-    FILL       shift, and go to state 44
-    CIRCLE     shift, and go to state 45
-    FLOOR      shift, and go to state 18
-    IF         shift, and go to state 46
-    WHILE      shift, and go to state 47
-    LOOP       shift, and go to state 48
-    EXIT       shift, and go to state 49
-    DO         shift, and go to state 50
-    FOR        shift, and go to state 51
-    SAVECOLOR  shift, and go to state 52
-    USECOLOR   shift, and go to state 53
-    USESIZE    shift, and go to state 54
-    SAVEBRUSH  shift, and go to state 55
-    USEBRUSH   shift, and go to state 56
+    BY         shift, and go to state 18
+    FROM       shift, and go to state 19
+    TO         shift, and go to state 20
+    FILL       shift, and go to state 21
+    CIRCLE     shift, and go to state 22
+    FLOOR      shift, and go to state 23
+    IF         shift, and go to state 24
+    WHILE      shift, and go to state 25
+    LOOP       shift, and go to state 26
+    EXIT       shift, and go to state 27
+    DO         shift, and go to state 28
+    FOR        shift, and go to state 29
+    SAVECOLOR  shift, and go to state 30
+    USECOLOR   shift, and go to state 31
+    USESIZE    shift, and go to state 32
+    SAVEBRUSH  shift, and go to state 33
+    USEBRUSH   shift, and go to state 34
 
-    NUMBER     [reduce using rule 75 (elsec)]
-    ID         [reduce using rule 75 (elsec)]
-    OPENBRACE  [reduce using rule 75 (elsec)]
-    MINUS      [reduce using rule 75 (elsec)]
-    COS        [reduce using rule 75 (elsec)]
-    SIN        [reduce using rule 75 (elsec)]
-    TAN        [reduce using rule 75 (elsec)]
-    LOG        [reduce using rule 75 (elsec)]
-    LN         [reduce using rule 75 (elsec)]
-    BY         [reduce using rule 75 (elsec)]
-    FROM       [reduce using rule 75 (elsec)]
-    TO         [reduce using rule 75 (elsec)]
-    FILL       [reduce using rule 75 (elsec)]
-    CIRCLE     [reduce using rule 75 (elsec)]
-    FLOOR      [reduce using rule 75 (elsec)]
-    IF         [reduce using rule 75 (elsec)]
-    WHILE      [reduce using rule 75 (elsec)]
-    LOOP       [reduce using rule 75 (elsec)]
-    EXIT       [reduce using rule 75 (elsec)]
-    DO         [reduce using rule 75 (elsec)]
-    FOR        [reduce using rule 75 (elsec)]
-    SAVECOLOR  [reduce using rule 75 (elsec)]
-    USECOLOR   [reduce using rule 75 (elsec)]
-    USESIZE    [reduce using rule 75 (elsec)]
-    SAVEBRUSH  [reduce using rule 75 (elsec)]
-    USEBRUSH   [reduce using rule 75 (elsec)]
-    $default   reduce using rule 75 (elsec)
+    NUMBER     [reduce using rule 78 (elsec)]
+    ID         [reduce using rule 78 (elsec)]
+    OPENBRACE  [reduce using rule 78 (elsec)]
+    PROC       [reduce using rule 78 (elsec)]
+    MINUS      [reduce using rule 78 (elsec)]
+    COS        [reduce using rule 78 (elsec)]
+    SIN        [reduce using rule 78 (elsec)]
+    TAN        [reduce using rule 78 (elsec)]
+    LOG        [reduce using rule 78 (elsec)]
+    LN         [reduce using rule 78 (elsec)]
+    BY         [reduce using rule 78 (elsec)]
+    FROM       [reduce using rule 78 (elsec)]
+    TO         [reduce using rule 78 (elsec)]
+    FILL       [reduce using rule 78 (elsec)]
+    CIRCLE     [reduce using rule 78 (elsec)]
+    FLOOR      [reduce using rule 78 (elsec)]
+    IF         [reduce using rule 78 (elsec)]
+    WHILE      [reduce using rule 78 (elsec)]
+    LOOP       [reduce using rule 78 (elsec)]
+    EXIT       [reduce using rule 78 (elsec)]
+    DO         [reduce using rule 78 (elsec)]
+    FOR        [reduce using rule 78 (elsec)]
+    SAVECOLOR  [reduce using rule 78 (elsec)]
+    USECOLOR   [reduce using rule 78 (elsec)]
+    USESIZE    [reduce using rule 78 (elsec)]
+    SAVEBRUSH  [reduce using rule 78 (elsec)]
+    USEBRUSH   [reduce using rule 78 (elsec)]
+    $default   reduce using rule 78 (elsec)
 
-    stmts   go to state 171
-    stmt    go to state 172
-    expr    go to state 20
-    prod    go to state 21
-    div     go to state 22
-    cos     go to state 23
-    sin     go to state 24
-    tan     go to state 25
-    ln      go to state 26
-    log     go to state 27
-    floor   go to state 28
-    atom    go to state 29
-    var     go to state 59
-    circle  go to state 60
-    elsec   go to state 61
-    ifc     go to state 62
-    whilec  go to state 63
-    forc    go to state 64
-
-
-state 147
-
-   89 stmt: DO OPENBRACE NUMBER CLOSEBRACE . @9 block
-
-    $default  reduce using rule 88 (@9)
-
-    @9  go to state 173
+    stmts   go to state 170
+    proc    go to state 36
+    stmt    go to state 171
+    expr    go to state 38
+    prod    go to state 39
+    div     go to state 40
+    cos     go to state 41
+    sin     go to state 42
+    tan     go to state 43
+    ln      go to state 44
+    log     go to state 45
+    floor   go to state 46
+    atom    go to state 47
+    var     go to state 48
+    circle  go to state 49
+    elsec   go to state 50
+    ifc     go to state 51
+    whilec  go to state 52
+    forc    go to state 53
 
 
-state 148
+state 142
 
-   95 forc: FOR OPENBRACE var @12 . SEMICOLON bool SEMICOLON @13 var CLOSEBRACE block
+    7 block: OPENCURLYBRACE @2 . stmts RETURN expr SEMICOLON CLOSECURLYBRACE
+
+    NUMBER     shift, and go to state 9
+    ID         shift, and go to state 10
+    OPENBRACE  shift, and go to state 11
+    PROC       shift, and go to state 5
+    MINUS      shift, and go to state 12
+    COS        shift, and go to state 13
+    SIN        shift, and go to state 14
+    TAN        shift, and go to state 15
+    LOG        shift, and go to state 16
+    LN         shift, and go to state 17
+    BY         shift, and go to state 18
+    FROM       shift, and go to state 19
+    TO         shift, and go to state 20
+    FILL       shift, and go to state 21
+    CIRCLE     shift, and go to state 22
+    FLOOR      shift, and go to state 23
+    IF         shift, and go to state 24
+    WHILE      shift, and go to state 25
+    LOOP       shift, and go to state 26
+    EXIT       shift, and go to state 27
+    DO         shift, and go to state 28
+    FOR        shift, and go to state 29
+    SAVECOLOR  shift, and go to state 30
+    USECOLOR   shift, and go to state 31
+    USESIZE    shift, and go to state 32
+    SAVEBRUSH  shift, and go to state 33
+    USEBRUSH   shift, and go to state 34
+
+    NUMBER     [reduce using rule 78 (elsec)]
+    ID         [reduce using rule 78 (elsec)]
+    OPENBRACE  [reduce using rule 78 (elsec)]
+    PROC       [reduce using rule 78 (elsec)]
+    MINUS      [reduce using rule 78 (elsec)]
+    COS        [reduce using rule 78 (elsec)]
+    SIN        [reduce using rule 78 (elsec)]
+    TAN        [reduce using rule 78 (elsec)]
+    LOG        [reduce using rule 78 (elsec)]
+    LN         [reduce using rule 78 (elsec)]
+    BY         [reduce using rule 78 (elsec)]
+    FROM       [reduce using rule 78 (elsec)]
+    TO         [reduce using rule 78 (elsec)]
+    FILL       [reduce using rule 78 (elsec)]
+    CIRCLE     [reduce using rule 78 (elsec)]
+    FLOOR      [reduce using rule 78 (elsec)]
+    IF         [reduce using rule 78 (elsec)]
+    WHILE      [reduce using rule 78 (elsec)]
+    LOOP       [reduce using rule 78 (elsec)]
+    EXIT       [reduce using rule 78 (elsec)]
+    DO         [reduce using rule 78 (elsec)]
+    FOR        [reduce using rule 78 (elsec)]
+    SAVECOLOR  [reduce using rule 78 (elsec)]
+    USECOLOR   [reduce using rule 78 (elsec)]
+    USESIZE    [reduce using rule 78 (elsec)]
+    SAVEBRUSH  [reduce using rule 78 (elsec)]
+    USEBRUSH   [reduce using rule 78 (elsec)]
+    $default   reduce using rule 78 (elsec)
+
+    stmts   go to state 172
+    proc    go to state 36
+    stmt    go to state 171
+    expr    go to state 38
+    prod    go to state 39
+    div     go to state 40
+    cos     go to state 41
+    sin     go to state 42
+    tan     go to state 43
+    ln      go to state 44
+    log     go to state 45
+    floor   go to state 46
+    atom    go to state 47
+    var     go to state 48
+    circle  go to state 49
+    elsec   go to state 50
+    ifc     go to state 51
+    whilec  go to state 52
+    forc    go to state 53
+
+
+state 143
+
+   92 stmt: DO OPENBRACE NUMBER CLOSEBRACE . @11 block
+
+    $default  reduce using rule 91 (@11)
+
+    @11  go to state 173
+
+
+state 144
+
+   99 forc: FOR OPENBRACE var @14 . SEMICOLON bool SEMICOLON @15 var CLOSEBRACE block
 
     SEMICOLON  shift, and go to state 174
 
 
-state 149
+state 145
 
-   57 stmt: SAVECOLOR OPENBRACE NUMBER COMMA . NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+   60 stmt: SAVECOLOR OPENBRACE NUMBER COMMA . NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
 
     NUMBER  shift, and go to state 175
 
 
-state 150
+state 146
 
-   58 stmt: USECOLOR OPENBRACE NUMBER COMMA . NUMBER COMMA NUMBER CLOSEBRACE SEMICOLON
+   61 stmt: USECOLOR OPENBRACE NUMBER COMMA . NUMBER COMMA NUMBER CLOSEBRACE SEMICOLON
 
     NUMBER  shift, and go to state 176
 
 
-state 151
+state 147
 
-   59 stmt: USECOLOR OPENBRACE ID CLOSEBRACE . SEMICOLON
+   62 stmt: USECOLOR OPENBRACE ID CLOSEBRACE . SEMICOLON
 
     SEMICOLON  shift, and go to state 177
 
 
-state 152
+state 148
 
-   60 stmt: USESIZE OPENBRACE NUMBER CLOSEBRACE . SEMICOLON
+   63 stmt: USESIZE OPENBRACE expr CLOSEBRACE . SEMICOLON
 
     SEMICOLON  shift, and go to state 178
 
 
-state 153
+state 149
 
-   61 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA . NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+   64 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA . NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
 
     NUMBER  shift, and go to state 179
 
 
-state 154
+state 150
 
-   62 stmt: SAVEBRUSH OPENBRACE ID COMMA . NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+   65 stmt: SAVEBRUSH OPENBRACE ID COMMA . NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
 
     NUMBER  shift, and go to state 180
 
 
-state 155
+state 151
 
-   63 stmt: USEBRUSH OPENBRACE ID CLOSEBRACE . SEMICOLON
+   66 stmt: USEBRUSH OPENBRACE ID CLOSEBRACE . SEMICOLON
 
     SEMICOLON  shift, and go to state 181
 
 
+state 152
+
+   56 var: expr DOUBLEPOINT EXPORTER ID .
+
+    $default  reduce using rule 56 (var)
+
+
+state 153
+
+   84 ifc: IF . OPENBRACE bool CLOSEBRACE @9 block
+
+    OPENBRACE  shift, and go to state 72
+
+
+state 154
+
+   80 elsec: ifc ELSE @7 elsec .
+
+    $default  reduce using rule 80 (elsec)
+
+
+state 155
+
+   80 elsec: ifc . ELSE @7 elsec
+   82      | ifc . ELSE @8 block
+
+    ELSE  shift, and go to state 93
+
+
 state 156
 
-   81 ifc: IF . OPENBRACE bool CLOSEBRACE @7 block
+   82 elsec: ifc ELSE @8 block .
 
-    OPENBRACE  shift, and go to state 85
+    $default  reduce using rule 82 (elsec)
 
 
 state 157
 
-   77 elsec: ifc ELSE @5 elsec .
+   19 arguments: ID COMMA . arguments
 
-    $default  reduce using rule 77 (elsec)
+    ID  shift, and go to state 127
+
+    arguments  go to state 182
 
 
 state 158
 
-   77 elsec: ifc . ELSE @5 elsec
-   79      | ifc . ELSE @6 block
+   15 proc: PROC ID @3 OPENBRACE arglist CLOSEBRACE . block
 
-    ELSE  shift, and go to state 98
+    OPENCURLYBRACE  shift, and go to state 107
+
+    block  go to state 183
 
 
 state 159
 
-   79 elsec: ifc ELSE @6 block .
+   20 stmt: ID OPENBRACE paramlist CLOSEBRACE SEMICOLON .
 
-    $default  reduce using rule 79 (elsec)
+    $default  reduce using rule 20 (stmt)
 
 
 state 160
 
-   18 stmt: ID OPENBRACE paramlist CLOSEBRACE SEMICOLON .
+   24 params: params COMMA expr .
+   39 expr: expr . PLUS expr
+   40     | expr . MINUS expr
+   41     | expr . MOD expr
 
-    $default  reduce using rule 18 (stmt)
+    PLUS   shift, and go to state 86
+    MINUS  shift, and go to state 87
+    MOD    shift, and go to state 88
+
+    $default  reduce using rule 24 (params)
 
 
 state 161
 
-   22 params: params COMMA expr .
-   37 expr: expr . PLUS expr
-   38     | expr . MINUS expr
-   39     | expr . MOD expr
+   75 circle: CIRCLE point NUMBER NUMBER NUMBER .
 
-    PLUS   shift, and go to state 67
-    MINUS  shift, and go to state 68
-    MOD    shift, and go to state 69
-
-    $default  reduce using rule 22 (params)
+    $default  reduce using rule 75 (circle)
 
 
 state 162
 
-   72 circle: CIRCLE point NUMBER NUMBER NUMBER .
+   84 ifc: IF OPENBRACE bool CLOSEBRACE @9 . block
 
-    $default  reduce using rule 72 (circle)
+    OPENCURLYBRACE  shift, and go to state 107
+
+    block  go to state 184
 
 
 state 163
 
-   81 ifc: IF OPENBRACE bool CLOSEBRACE @7 . block
+   27 bool: expr EXPORTER EXPORTER . expr
 
-    OPENCURLYBRACE  shift, and go to state 119
+    NUMBER     shift, and go to state 9
+    ID         shift, and go to state 56
+    OPENBRACE  shift, and go to state 11
+    MINUS      shift, and go to state 12
+    COS        shift, and go to state 13
+    SIN        shift, and go to state 14
+    TAN        shift, and go to state 15
+    LOG        shift, and go to state 16
+    LN         shift, and go to state 17
+    FLOOR      shift, and go to state 23
 
-    block  go to state 182
+    expr   go to state 185
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
 
 
 state 164
 
-   25 bool: expr EXPORTER EXPORTER . expr
+   28 bool: expr EXPORTER EQUALS . expr
 
     NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
+    ID         shift, and go to state 56
     OPENBRACE  shift, and go to state 11
     MINUS      shift, and go to state 12
     COS        shift, and go to state 13
@@ -2170,26 +2355,26 @@ state 164
     TAN        shift, and go to state 15
     LOG        shift, and go to state 16
     LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
+    FLOOR      shift, and go to state 23
 
-    expr   go to state 183
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
+    expr   go to state 186
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
 
 
 state 165
 
-   26 bool: expr EXPORTER EQUALS . expr
+   25 bool: expr IMPORTER IMPORTER . expr
 
     NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
+    ID         shift, and go to state 56
     OPENBRACE  shift, and go to state 11
     MINUS      shift, and go to state 12
     COS        shift, and go to state 13
@@ -2197,26 +2382,26 @@ state 165
     TAN        shift, and go to state 15
     LOG        shift, and go to state 16
     LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
+    FLOOR      shift, and go to state 23
 
-    expr   go to state 184
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
+    expr   go to state 187
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
 
 
 state 166
 
-   23 bool: expr IMPORTER IMPORTER . expr
+   26 bool: expr IMPORTER EQUALS . expr
 
     NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
+    ID         shift, and go to state 56
     OPENBRACE  shift, and go to state 11
     MINUS      shift, and go to state 12
     COS        shift, and go to state 13
@@ -2224,26 +2409,26 @@ state 166
     TAN        shift, and go to state 15
     LOG        shift, and go to state 16
     LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
+    FLOOR      shift, and go to state 23
 
-    expr   go to state 185
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
+    expr   go to state 188
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
 
 
 state 167
 
-   24 bool: expr IMPORTER EQUALS . expr
+   29 bool: expr EQUALS EQUALS . expr
 
     NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
+    ID         shift, and go to state 56
     OPENBRACE  shift, and go to state 11
     MINUS      shift, and go to state 12
     COS        shift, and go to state 13
@@ -2251,26 +2436,26 @@ state 167
     TAN        shift, and go to state 15
     LOG        shift, and go to state 16
     LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
+    FLOOR      shift, and go to state 23
 
-    expr   go to state 186
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
+    expr   go to state 189
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
 
 
 state 168
 
-   27 bool: expr EQUALS EQUALS . expr
+   30 bool: expr NOT EQUALS . expr
 
     NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
+    ID         shift, and go to state 56
     OPENBRACE  shift, and go to state 11
     MINUS      shift, and go to state 12
     COS        shift, and go to state 13
@@ -2278,158 +2463,217 @@ state 168
     TAN        shift, and go to state 15
     LOG        shift, and go to state 16
     LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
+    FLOOR      shift, and go to state 23
 
-    expr   go to state 187
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
+    expr   go to state 190
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
 
 
 state 169
 
-   28 bool: expr NOT EQUALS . expr
+   95 whilec: WHILE OPENBRACE @12 bool CLOSEBRACE . @13 block
 
-    NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
-    OPENBRACE  shift, and go to state 11
-    MINUS      shift, and go to state 12
-    COS        shift, and go to state 13
-    SIN        shift, and go to state 14
-    TAN        shift, and go to state 15
-    LOG        shift, and go to state 16
-    LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
+    $default  reduce using rule 94 (@13)
 
-    expr   go to state 188
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
+    @13  go to state 191
 
 
 state 170
 
-   92 whilec: WHILE OPENBRACE @10 bool CLOSEBRACE . @11 block
-
-    $default  reduce using rule 91 (@11)
-
-    @11  go to state 189
-
-
-state 171
-
     5 block: OPENCURLYBRACE @1 stmts . CLOSECURLYBRACE
-    8 stmts: stmts . stmt
+   10 stmts: stmts . stmt
 
     NUMBER           shift, and go to state 9
-    ID               shift, and go to state 40
+    ID               shift, and go to state 10
     OPENBRACE        shift, and go to state 11
-    CLOSECURLYBRACE  shift, and go to state 190
+    CLOSECURLYBRACE  shift, and go to state 192
+    PROC             shift, and go to state 5
     MINUS            shift, and go to state 12
     COS              shift, and go to state 13
     SIN              shift, and go to state 14
     TAN              shift, and go to state 15
     LOG              shift, and go to state 16
     LN               shift, and go to state 17
-    BY               shift, and go to state 41
-    FROM             shift, and go to state 42
-    TO               shift, and go to state 43
-    FILL             shift, and go to state 44
-    CIRCLE           shift, and go to state 45
-    FLOOR            shift, and go to state 18
-    IF               shift, and go to state 46
-    WHILE            shift, and go to state 47
-    LOOP             shift, and go to state 48
-    EXIT             shift, and go to state 49
-    DO               shift, and go to state 50
-    FOR              shift, and go to state 51
-    SAVECOLOR        shift, and go to state 52
-    USECOLOR         shift, and go to state 53
-    USESIZE          shift, and go to state 54
-    SAVEBRUSH        shift, and go to state 55
-    USEBRUSH         shift, and go to state 56
+    BY               shift, and go to state 18
+    FROM             shift, and go to state 19
+    TO               shift, and go to state 20
+    FILL             shift, and go to state 21
+    CIRCLE           shift, and go to state 22
+    FLOOR            shift, and go to state 23
+    IF               shift, and go to state 24
+    WHILE            shift, and go to state 25
+    LOOP             shift, and go to state 26
+    EXIT             shift, and go to state 27
+    DO               shift, and go to state 28
+    FOR              shift, and go to state 29
+    SAVECOLOR        shift, and go to state 30
+    USECOLOR         shift, and go to state 31
+    USESIZE          shift, and go to state 32
+    SAVEBRUSH        shift, and go to state 33
+    USEBRUSH         shift, and go to state 34
 
-    NUMBER           [reduce using rule 75 (elsec)]
-    ID               [reduce using rule 75 (elsec)]
-    OPENBRACE        [reduce using rule 75 (elsec)]
-    CLOSECURLYBRACE  [reduce using rule 75 (elsec)]
-    MINUS            [reduce using rule 75 (elsec)]
-    COS              [reduce using rule 75 (elsec)]
-    SIN              [reduce using rule 75 (elsec)]
-    TAN              [reduce using rule 75 (elsec)]
-    LOG              [reduce using rule 75 (elsec)]
-    LN               [reduce using rule 75 (elsec)]
-    BY               [reduce using rule 75 (elsec)]
-    FROM             [reduce using rule 75 (elsec)]
-    TO               [reduce using rule 75 (elsec)]
-    FILL             [reduce using rule 75 (elsec)]
-    CIRCLE           [reduce using rule 75 (elsec)]
-    FLOOR            [reduce using rule 75 (elsec)]
-    IF               [reduce using rule 75 (elsec)]
-    WHILE            [reduce using rule 75 (elsec)]
-    LOOP             [reduce using rule 75 (elsec)]
-    EXIT             [reduce using rule 75 (elsec)]
-    DO               [reduce using rule 75 (elsec)]
-    FOR              [reduce using rule 75 (elsec)]
-    SAVECOLOR        [reduce using rule 75 (elsec)]
-    USECOLOR         [reduce using rule 75 (elsec)]
-    USESIZE          [reduce using rule 75 (elsec)]
-    SAVEBRUSH        [reduce using rule 75 (elsec)]
-    USEBRUSH         [reduce using rule 75 (elsec)]
+    NUMBER           [reduce using rule 78 (elsec)]
+    ID               [reduce using rule 78 (elsec)]
+    OPENBRACE        [reduce using rule 78 (elsec)]
+    CLOSECURLYBRACE  [reduce using rule 78 (elsec)]
+    PROC             [reduce using rule 78 (elsec)]
+    MINUS            [reduce using rule 78 (elsec)]
+    COS              [reduce using rule 78 (elsec)]
+    SIN              [reduce using rule 78 (elsec)]
+    TAN              [reduce using rule 78 (elsec)]
+    LOG              [reduce using rule 78 (elsec)]
+    LN               [reduce using rule 78 (elsec)]
+    BY               [reduce using rule 78 (elsec)]
+    FROM             [reduce using rule 78 (elsec)]
+    TO               [reduce using rule 78 (elsec)]
+    FILL             [reduce using rule 78 (elsec)]
+    CIRCLE           [reduce using rule 78 (elsec)]
+    FLOOR            [reduce using rule 78 (elsec)]
+    IF               [reduce using rule 78 (elsec)]
+    WHILE            [reduce using rule 78 (elsec)]
+    LOOP             [reduce using rule 78 (elsec)]
+    EXIT             [reduce using rule 78 (elsec)]
+    DO               [reduce using rule 78 (elsec)]
+    FOR              [reduce using rule 78 (elsec)]
+    SAVECOLOR        [reduce using rule 78 (elsec)]
+    USECOLOR         [reduce using rule 78 (elsec)]
+    USESIZE          [reduce using rule 78 (elsec)]
+    SAVEBRUSH        [reduce using rule 78 (elsec)]
+    USEBRUSH         [reduce using rule 78 (elsec)]
 
-    stmt    go to state 191
-    expr    go to state 20
-    prod    go to state 21
-    div     go to state 22
-    cos     go to state 23
-    sin     go to state 24
-    tan     go to state 25
-    ln      go to state 26
-    log     go to state 27
-    floor   go to state 28
-    atom    go to state 29
-    var     go to state 59
-    circle  go to state 60
-    elsec   go to state 61
-    ifc     go to state 62
-    whilec  go to state 63
-    forc    go to state 64
+    proc    go to state 36
+    stmt    go to state 193
+    expr    go to state 38
+    prod    go to state 39
+    div     go to state 40
+    cos     go to state 41
+    sin     go to state 42
+    tan     go to state 43
+    ln      go to state 44
+    log     go to state 45
+    floor   go to state 46
+    atom    go to state 47
+    var     go to state 48
+    circle  go to state 49
+    elsec   go to state 50
+    ifc     go to state 51
+    whilec  go to state 52
+    forc    go to state 53
+
+
+state 171
+
+   11 stmts: stmt .
+
+    $default  reduce using rule 11 (stmts)
 
 
 state 172
 
-    9 stmts: stmt .
+    7 block: OPENCURLYBRACE @2 stmts . RETURN expr SEMICOLON CLOSECURLYBRACE
+   10 stmts: stmts . stmt
 
-    $default  reduce using rule 9 (stmts)
+    NUMBER     shift, and go to state 9
+    ID         shift, and go to state 10
+    OPENBRACE  shift, and go to state 11
+    PROC       shift, and go to state 5
+    RETURN     shift, and go to state 194
+    MINUS      shift, and go to state 12
+    COS        shift, and go to state 13
+    SIN        shift, and go to state 14
+    TAN        shift, and go to state 15
+    LOG        shift, and go to state 16
+    LN         shift, and go to state 17
+    BY         shift, and go to state 18
+    FROM       shift, and go to state 19
+    TO         shift, and go to state 20
+    FILL       shift, and go to state 21
+    CIRCLE     shift, and go to state 22
+    FLOOR      shift, and go to state 23
+    IF         shift, and go to state 24
+    WHILE      shift, and go to state 25
+    LOOP       shift, and go to state 26
+    EXIT       shift, and go to state 27
+    DO         shift, and go to state 28
+    FOR        shift, and go to state 29
+    SAVECOLOR  shift, and go to state 30
+    USECOLOR   shift, and go to state 31
+    USESIZE    shift, and go to state 32
+    SAVEBRUSH  shift, and go to state 33
+    USEBRUSH   shift, and go to state 34
+
+    NUMBER     [reduce using rule 78 (elsec)]
+    ID         [reduce using rule 78 (elsec)]
+    OPENBRACE  [reduce using rule 78 (elsec)]
+    PROC       [reduce using rule 78 (elsec)]
+    RETURN     [reduce using rule 78 (elsec)]
+    MINUS      [reduce using rule 78 (elsec)]
+    COS        [reduce using rule 78 (elsec)]
+    SIN        [reduce using rule 78 (elsec)]
+    TAN        [reduce using rule 78 (elsec)]
+    LOG        [reduce using rule 78 (elsec)]
+    LN         [reduce using rule 78 (elsec)]
+    BY         [reduce using rule 78 (elsec)]
+    FROM       [reduce using rule 78 (elsec)]
+    TO         [reduce using rule 78 (elsec)]
+    FILL       [reduce using rule 78 (elsec)]
+    CIRCLE     [reduce using rule 78 (elsec)]
+    FLOOR      [reduce using rule 78 (elsec)]
+    IF         [reduce using rule 78 (elsec)]
+    WHILE      [reduce using rule 78 (elsec)]
+    LOOP       [reduce using rule 78 (elsec)]
+    EXIT       [reduce using rule 78 (elsec)]
+    DO         [reduce using rule 78 (elsec)]
+    FOR        [reduce using rule 78 (elsec)]
+    SAVECOLOR  [reduce using rule 78 (elsec)]
+    USECOLOR   [reduce using rule 78 (elsec)]
+    USESIZE    [reduce using rule 78 (elsec)]
+    SAVEBRUSH  [reduce using rule 78 (elsec)]
+    USEBRUSH   [reduce using rule 78 (elsec)]
+
+    proc    go to state 36
+    stmt    go to state 193
+    expr    go to state 38
+    prod    go to state 39
+    div     go to state 40
+    cos     go to state 41
+    sin     go to state 42
+    tan     go to state 43
+    ln      go to state 44
+    log     go to state 45
+    floor   go to state 46
+    atom    go to state 47
+    var     go to state 48
+    circle  go to state 49
+    elsec   go to state 50
+    ifc     go to state 51
+    whilec  go to state 52
+    forc    go to state 53
 
 
 state 173
 
-   89 stmt: DO OPENBRACE NUMBER CLOSEBRACE @9 . block
+   92 stmt: DO OPENBRACE NUMBER CLOSEBRACE @11 . block
 
-    OPENCURLYBRACE  shift, and go to state 119
+    OPENCURLYBRACE  shift, and go to state 107
 
-    block  go to state 192
+    block  go to state 195
 
 
 state 174
 
-   95 forc: FOR OPENBRACE var @12 SEMICOLON . bool SEMICOLON @13 var CLOSEBRACE block
+   99 forc: FOR OPENBRACE var @14 SEMICOLON . bool SEMICOLON @15 var CLOSEBRACE block
 
     NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
+    ID         shift, and go to state 56
     OPENBRACE  shift, and go to state 11
     MINUS      shift, and go to state 12
     COS        shift, and go to state 13
@@ -2437,276 +2681,204 @@ state 174
     TAN        shift, and go to state 15
     LOG        shift, and go to state 16
     LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
+    FLOOR      shift, and go to state 23
 
-    bool   go to state 193
-    expr   go to state 117
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
+    bool   go to state 196
+    expr   go to state 105
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
 
 
 state 175
 
-   57 stmt: SAVECOLOR OPENBRACE NUMBER COMMA NUMBER . COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+   60 stmt: SAVECOLOR OPENBRACE NUMBER COMMA NUMBER . COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
 
-    COMMA  shift, and go to state 194
+    COMMA  shift, and go to state 197
 
 
 state 176
 
-   58 stmt: USECOLOR OPENBRACE NUMBER COMMA NUMBER . COMMA NUMBER CLOSEBRACE SEMICOLON
+   61 stmt: USECOLOR OPENBRACE NUMBER COMMA NUMBER . COMMA NUMBER CLOSEBRACE SEMICOLON
 
-    COMMA  shift, and go to state 195
+    COMMA  shift, and go to state 198
 
 
 state 177
 
-   59 stmt: USECOLOR OPENBRACE ID CLOSEBRACE SEMICOLON .
+   62 stmt: USECOLOR OPENBRACE ID CLOSEBRACE SEMICOLON .
 
-    $default  reduce using rule 59 (stmt)
+    $default  reduce using rule 62 (stmt)
 
 
 state 178
 
-   60 stmt: USESIZE OPENBRACE NUMBER CLOSEBRACE SEMICOLON .
-
-    $default  reduce using rule 60 (stmt)
-
-
-state 179
-
-   61 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER . COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
-
-    COMMA  shift, and go to state 196
-
-
-state 180
-
-   62 stmt: SAVEBRUSH OPENBRACE ID COMMA NUMBER . CLOSEBRACE EXPORTER ID SEMICOLON
-
-    CLOSEBRACE  shift, and go to state 197
-
-
-state 181
-
-   63 stmt: USEBRUSH OPENBRACE ID CLOSEBRACE SEMICOLON .
+   63 stmt: USESIZE OPENBRACE expr CLOSEBRACE SEMICOLON .
 
     $default  reduce using rule 63 (stmt)
 
 
+state 179
+
+   64 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER . COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+
+    COMMA  shift, and go to state 199
+
+
+state 180
+
+   65 stmt: SAVEBRUSH OPENBRACE ID COMMA NUMBER . CLOSEBRACE EXPORTER ID SEMICOLON
+
+    CLOSEBRACE  shift, and go to state 200
+
+
+state 181
+
+   66 stmt: USEBRUSH OPENBRACE ID CLOSEBRACE SEMICOLON .
+
+    $default  reduce using rule 66 (stmt)
+
+
 state 182
 
-   81 ifc: IF OPENBRACE bool CLOSEBRACE @7 block .
+   19 arguments: ID COMMA arguments .
 
-    $default  reduce using rule 81 (ifc)
+    $default  reduce using rule 19 (arguments)
 
 
 state 183
 
-   25 bool: expr EXPORTER EXPORTER expr .
-   37 expr: expr . PLUS expr
-   38     | expr . MINUS expr
-   39     | expr . MOD expr
+   15 proc: PROC ID @3 OPENBRACE arglist CLOSEBRACE block .
 
-    PLUS   shift, and go to state 67
-    MINUS  shift, and go to state 68
-    MOD    shift, and go to state 69
-
-    $default  reduce using rule 25 (bool)
+    $default  reduce using rule 15 (proc)
 
 
 state 184
 
-   26 bool: expr EXPORTER EQUALS expr .
-   37 expr: expr . PLUS expr
-   38     | expr . MINUS expr
-   39     | expr . MOD expr
+   84 ifc: IF OPENBRACE bool CLOSEBRACE @9 block .
 
-    PLUS   shift, and go to state 67
-    MINUS  shift, and go to state 68
-    MOD    shift, and go to state 69
-
-    $default  reduce using rule 26 (bool)
+    $default  reduce using rule 84 (ifc)
 
 
 state 185
 
-   23 bool: expr IMPORTER IMPORTER expr .
-   37 expr: expr . PLUS expr
-   38     | expr . MINUS expr
-   39     | expr . MOD expr
+   27 bool: expr EXPORTER EXPORTER expr .
+   39 expr: expr . PLUS expr
+   40     | expr . MINUS expr
+   41     | expr . MOD expr
 
-    PLUS   shift, and go to state 67
-    MINUS  shift, and go to state 68
-    MOD    shift, and go to state 69
-
-    $default  reduce using rule 23 (bool)
-
-
-state 186
-
-   24 bool: expr IMPORTER EQUALS expr .
-   37 expr: expr . PLUS expr
-   38     | expr . MINUS expr
-   39     | expr . MOD expr
-
-    PLUS   shift, and go to state 67
-    MINUS  shift, and go to state 68
-    MOD    shift, and go to state 69
-
-    $default  reduce using rule 24 (bool)
-
-
-state 187
-
-   27 bool: expr EQUALS EQUALS expr .
-   37 expr: expr . PLUS expr
-   38     | expr . MINUS expr
-   39     | expr . MOD expr
-
-    PLUS   shift, and go to state 67
-    MINUS  shift, and go to state 68
-    MOD    shift, and go to state 69
+    PLUS   shift, and go to state 86
+    MINUS  shift, and go to state 87
+    MOD    shift, and go to state 88
 
     $default  reduce using rule 27 (bool)
 
 
-state 188
+state 186
 
-   28 bool: expr NOT EQUALS expr .
-   37 expr: expr . PLUS expr
-   38     | expr . MINUS expr
-   39     | expr . MOD expr
+   28 bool: expr EXPORTER EQUALS expr .
+   39 expr: expr . PLUS expr
+   40     | expr . MINUS expr
+   41     | expr . MOD expr
 
-    PLUS   shift, and go to state 67
-    MINUS  shift, and go to state 68
-    MOD    shift, and go to state 69
+    PLUS   shift, and go to state 86
+    MINUS  shift, and go to state 87
+    MOD    shift, and go to state 88
 
     $default  reduce using rule 28 (bool)
 
 
+state 187
+
+   25 bool: expr IMPORTER IMPORTER expr .
+   39 expr: expr . PLUS expr
+   40     | expr . MINUS expr
+   41     | expr . MOD expr
+
+    PLUS   shift, and go to state 86
+    MINUS  shift, and go to state 87
+    MOD    shift, and go to state 88
+
+    $default  reduce using rule 25 (bool)
+
+
+state 188
+
+   26 bool: expr IMPORTER EQUALS expr .
+   39 expr: expr . PLUS expr
+   40     | expr . MINUS expr
+   41     | expr . MOD expr
+
+    PLUS   shift, and go to state 86
+    MINUS  shift, and go to state 87
+    MOD    shift, and go to state 88
+
+    $default  reduce using rule 26 (bool)
+
+
 state 189
 
-   92 whilec: WHILE OPENBRACE @10 bool CLOSEBRACE @11 . block
+   29 bool: expr EQUALS EQUALS expr .
+   39 expr: expr . PLUS expr
+   40     | expr . MINUS expr
+   41     | expr . MOD expr
 
-    OPENCURLYBRACE  shift, and go to state 119
+    PLUS   shift, and go to state 86
+    MINUS  shift, and go to state 87
+    MOD    shift, and go to state 88
 
-    block  go to state 198
+    $default  reduce using rule 29 (bool)
 
 
 state 190
+
+   30 bool: expr NOT EQUALS expr .
+   39 expr: expr . PLUS expr
+   40     | expr . MINUS expr
+   41     | expr . MOD expr
+
+    PLUS   shift, and go to state 86
+    MINUS  shift, and go to state 87
+    MOD    shift, and go to state 88
+
+    $default  reduce using rule 30 (bool)
+
+
+state 191
+
+   95 whilec: WHILE OPENBRACE @12 bool CLOSEBRACE @13 . block
+
+    OPENCURLYBRACE  shift, and go to state 107
+
+    block  go to state 201
+
+
+state 192
 
     5 block: OPENCURLYBRACE @1 stmts CLOSECURLYBRACE .
 
     $default  reduce using rule 5 (block)
 
 
-state 191
-
-    8 stmts: stmts stmt .
-
-    $default  reduce using rule 8 (stmts)
-
-
-state 192
-
-   89 stmt: DO OPENBRACE NUMBER CLOSEBRACE @9 block .
-
-    $default  reduce using rule 89 (stmt)
-
-
 state 193
 
-   95 forc: FOR OPENBRACE var @12 SEMICOLON bool . SEMICOLON @13 var CLOSEBRACE block
+   10 stmts: stmts stmt .
 
-    SEMICOLON  shift, and go to state 199
+    $default  reduce using rule 10 (stmts)
 
 
 state 194
 
-   57 stmt: SAVECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA . NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
-
-    NUMBER  shift, and go to state 200
-
-
-state 195
-
-   58 stmt: USECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA . NUMBER CLOSEBRACE SEMICOLON
-
-    NUMBER  shift, and go to state 201
-
-
-state 196
-
-   61 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER COMMA . NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
-
-    NUMBER  shift, and go to state 202
-
-
-state 197
-
-   62 stmt: SAVEBRUSH OPENBRACE ID COMMA NUMBER CLOSEBRACE . EXPORTER ID SEMICOLON
-
-    EXPORTER  shift, and go to state 203
-
-
-state 198
-
-   92 whilec: WHILE OPENBRACE @10 bool CLOSEBRACE @11 block .
-
-    $default  reduce using rule 92 (whilec)
-
-
-state 199
-
-   95 forc: FOR OPENBRACE var @12 SEMICOLON bool SEMICOLON . @13 var CLOSEBRACE block
-
-    $default  reduce using rule 94 (@13)
-
-    @13  go to state 204
-
-
-state 200
-
-   57 stmt: SAVECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER . CLOSEBRACE EXPORTER ID SEMICOLON
-
-    CLOSEBRACE  shift, and go to state 205
-
-
-state 201
-
-   58 stmt: USECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER . CLOSEBRACE SEMICOLON
-
-    CLOSEBRACE  shift, and go to state 206
-
-
-state 202
-
-   61 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER . COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
-
-    COMMA  shift, and go to state 207
-
-
-state 203
-
-   62 stmt: SAVEBRUSH OPENBRACE ID COMMA NUMBER CLOSEBRACE EXPORTER . ID SEMICOLON
-
-    ID  shift, and go to state 208
-
-
-state 204
-
-   95 forc: FOR OPENBRACE var @12 SEMICOLON bool SEMICOLON @13 . var CLOSEBRACE block
+    7 block: OPENCURLYBRACE @2 stmts RETURN . expr SEMICOLON CLOSECURLYBRACE
 
     NUMBER     shift, and go to state 9
-    ID         shift, and go to state 10
+    ID         shift, and go to state 56
     OPENBRACE  shift, and go to state 11
     MINUS      shift, and go to state 12
     COS        shift, and go to state 13
@@ -2714,137 +2886,277 @@ state 204
     TAN        shift, and go to state 15
     LOG        shift, and go to state 16
     LN         shift, and go to state 17
-    FLOOR      shift, and go to state 18
+    FLOOR      shift, and go to state 23
 
-    expr   go to state 20
-    prod   go to state 21
-    div    go to state 22
-    cos    go to state 23
-    sin    go to state 24
-    tan    go to state 25
-    ln     go to state 26
-    log    go to state 27
-    floor  go to state 28
-    atom   go to state 29
-    var    go to state 209
+    expr   go to state 202
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
+
+
+state 195
+
+   92 stmt: DO OPENBRACE NUMBER CLOSEBRACE @11 block .
+
+    $default  reduce using rule 92 (stmt)
+
+
+state 196
+
+   99 forc: FOR OPENBRACE var @14 SEMICOLON bool . SEMICOLON @15 var CLOSEBRACE block
+
+    SEMICOLON  shift, and go to state 203
+
+
+state 197
+
+   60 stmt: SAVECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA . NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+
+    NUMBER  shift, and go to state 204
+
+
+state 198
+
+   61 stmt: USECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA . NUMBER CLOSEBRACE SEMICOLON
+
+    NUMBER  shift, and go to state 205
+
+
+state 199
+
+   64 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER COMMA . NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+
+    NUMBER  shift, and go to state 206
+
+
+state 200
+
+   65 stmt: SAVEBRUSH OPENBRACE ID COMMA NUMBER CLOSEBRACE . EXPORTER ID SEMICOLON
+
+    EXPORTER  shift, and go to state 207
+
+
+state 201
+
+   95 whilec: WHILE OPENBRACE @12 bool CLOSEBRACE @13 block .
+
+    $default  reduce using rule 95 (whilec)
+
+
+state 202
+
+    7 block: OPENCURLYBRACE @2 stmts RETURN expr . SEMICOLON CLOSECURLYBRACE
+   39 expr: expr . PLUS expr
+   40     | expr . MINUS expr
+   41     | expr . MOD expr
+
+    SEMICOLON  shift, and go to state 208
+    PLUS       shift, and go to state 86
+    MINUS      shift, and go to state 87
+    MOD        shift, and go to state 88
+
+
+state 203
+
+   99 forc: FOR OPENBRACE var @14 SEMICOLON bool SEMICOLON . @15 var CLOSEBRACE block
+
+    $default  reduce using rule 98 (@15)
+
+    @15  go to state 209
+
+
+state 204
+
+   60 stmt: SAVECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER . CLOSEBRACE EXPORTER ID SEMICOLON
+
+    CLOSEBRACE  shift, and go to state 210
 
 
 state 205
 
-   57 stmt: SAVECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE . EXPORTER ID SEMICOLON
+   61 stmt: USECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER . CLOSEBRACE SEMICOLON
 
-    EXPORTER  shift, and go to state 210
+    CLOSEBRACE  shift, and go to state 211
 
 
 state 206
 
-   58 stmt: USECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE . SEMICOLON
+   64 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER . COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
 
-    SEMICOLON  shift, and go to state 211
+    COMMA  shift, and go to state 212
 
 
 state 207
 
-   61 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER COMMA . NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
+   65 stmt: SAVEBRUSH OPENBRACE ID COMMA NUMBER CLOSEBRACE EXPORTER . ID SEMICOLON
 
-    NUMBER  shift, and go to state 212
+    ID  shift, and go to state 213
 
 
 state 208
 
-   62 stmt: SAVEBRUSH OPENBRACE ID COMMA NUMBER CLOSEBRACE EXPORTER ID . SEMICOLON
+    7 block: OPENCURLYBRACE @2 stmts RETURN expr SEMICOLON . CLOSECURLYBRACE
 
-    SEMICOLON  shift, and go to state 213
+    CLOSECURLYBRACE  shift, and go to state 214
 
 
 state 209
 
-   95 forc: FOR OPENBRACE var @12 SEMICOLON bool SEMICOLON @13 var . CLOSEBRACE block
+   99 forc: FOR OPENBRACE var @14 SEMICOLON bool SEMICOLON @15 . var CLOSEBRACE block
 
-    CLOSEBRACE  shift, and go to state 214
+    NUMBER     shift, and go to state 9
+    ID         shift, and go to state 56
+    OPENBRACE  shift, and go to state 11
+    MINUS      shift, and go to state 12
+    COS        shift, and go to state 13
+    SIN        shift, and go to state 14
+    TAN        shift, and go to state 15
+    LOG        shift, and go to state 16
+    LN         shift, and go to state 17
+    FLOOR      shift, and go to state 23
+
+    expr   go to state 38
+    prod   go to state 39
+    div    go to state 40
+    cos    go to state 41
+    sin    go to state 42
+    tan    go to state 43
+    ln     go to state 44
+    log    go to state 45
+    floor  go to state 46
+    atom   go to state 47
+    var    go to state 215
 
 
 state 210
 
-   57 stmt: SAVECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER . ID SEMICOLON
+   60 stmt: SAVECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE . EXPORTER ID SEMICOLON
 
-    ID  shift, and go to state 215
+    EXPORTER  shift, and go to state 216
 
 
 state 211
 
-   58 stmt: USECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE SEMICOLON .
+   61 stmt: USECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE . SEMICOLON
 
-    $default  reduce using rule 58 (stmt)
+    SEMICOLON  shift, and go to state 217
 
 
 state 212
 
-   61 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER . CLOSEBRACE EXPORTER ID SEMICOLON
+   64 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER COMMA . NUMBER CLOSEBRACE EXPORTER ID SEMICOLON
 
-    CLOSEBRACE  shift, and go to state 216
+    NUMBER  shift, and go to state 218
 
 
 state 213
 
-   62 stmt: SAVEBRUSH OPENBRACE ID COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON .
+   65 stmt: SAVEBRUSH OPENBRACE ID COMMA NUMBER CLOSEBRACE EXPORTER ID . SEMICOLON
 
-    $default  reduce using rule 62 (stmt)
+    SEMICOLON  shift, and go to state 219
 
 
 state 214
 
-   95 forc: FOR OPENBRACE var @12 SEMICOLON bool SEMICOLON @13 var CLOSEBRACE . block
+    7 block: OPENCURLYBRACE @2 stmts RETURN expr SEMICOLON CLOSECURLYBRACE .
 
-    OPENCURLYBRACE  shift, and go to state 119
-
-    block  go to state 217
+    $default  reduce using rule 7 (block)
 
 
 state 215
 
-   57 stmt: SAVECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID . SEMICOLON
+   99 forc: FOR OPENBRACE var @14 SEMICOLON bool SEMICOLON @15 var . CLOSEBRACE block
 
-    SEMICOLON  shift, and go to state 218
+    CLOSEBRACE  shift, and go to state 220
 
 
 state 216
 
-   61 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE . EXPORTER ID SEMICOLON
+   60 stmt: SAVECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER . ID SEMICOLON
 
-    EXPORTER  shift, and go to state 219
+    ID  shift, and go to state 221
 
 
 state 217
 
-   95 forc: FOR OPENBRACE var @12 SEMICOLON bool SEMICOLON @13 var CLOSEBRACE block .
+   61 stmt: USECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE SEMICOLON .
 
-    $default  reduce using rule 95 (forc)
+    $default  reduce using rule 61 (stmt)
 
 
 state 218
 
-   57 stmt: SAVECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON .
+   64 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER . CLOSEBRACE EXPORTER ID SEMICOLON
 
-    $default  reduce using rule 57 (stmt)
+    CLOSEBRACE  shift, and go to state 222
 
 
 state 219
 
-   61 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER . ID SEMICOLON
+   65 stmt: SAVEBRUSH OPENBRACE ID COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON .
 
-    ID  shift, and go to state 220
+    $default  reduce using rule 65 (stmt)
 
 
 state 220
 
-   61 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID . SEMICOLON
+   99 forc: FOR OPENBRACE var @14 SEMICOLON bool SEMICOLON @15 var CLOSEBRACE . block
 
-    SEMICOLON  shift, and go to state 221
+    OPENCURLYBRACE  shift, and go to state 107
+
+    block  go to state 223
 
 
 state 221
 
-   61 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON .
+   60 stmt: SAVECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID . SEMICOLON
 
-    $default  reduce using rule 61 (stmt)
+    SEMICOLON  shift, and go to state 224
+
+
+state 222
+
+   64 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE . EXPORTER ID SEMICOLON
+
+    EXPORTER  shift, and go to state 225
+
+
+state 223
+
+   99 forc: FOR OPENBRACE var @14 SEMICOLON bool SEMICOLON @15 var CLOSEBRACE block .
+
+    $default  reduce using rule 99 (forc)
+
+
+state 224
+
+   60 stmt: SAVECOLOR OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON .
+
+    $default  reduce using rule 60 (stmt)
+
+
+state 225
+
+   64 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER . ID SEMICOLON
+
+    ID  shift, and go to state 226
+
+
+state 226
+
+   64 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID . SEMICOLON
+
+    SEMICOLON  shift, and go to state 227
+
+
+state 227
+
+   64 stmt: SAVEBRUSH OPENBRACE NUMBER COMMA NUMBER COMMA NUMBER COMMA NUMBER CLOSEBRACE EXPORTER ID SEMICOLON .
+
+    $default  reduce using rule 64 (stmt)
