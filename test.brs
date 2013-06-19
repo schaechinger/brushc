@@ -6,8 +6,8 @@
 // Copyright © 2013 Delivery Studios. All rights reserved.
 //
 
-57 > r;
-11 > c;
+100 > r;
+100000 > c;
 360 / c > angle;
 400 > x;
 400 > y;

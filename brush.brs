@@ -19,7 +19,7 @@ void diagonal(a, b)
 	}
 }
 
-/*
+
 func double(a)
 {
 	0 > b;
@@ -29,15 +29,18 @@ func double(a)
 	}
 	return b;
 }
-*/
+
+
+double(3);
+
 
 // global variables
-100 > a;
+//100 > a;
 0 > b;
 5 > y;
 
 from b,y to a,y;
-
+diagonal(1,2) > a;
 for (15 > i; i >> 10; i - 1 > i)
 {
 	y + 5 > y;

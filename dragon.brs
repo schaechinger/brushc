@@ -76,9 +76,12 @@ left(4, x, y, x + d, y + d);
 */
 
 useColor(color6);
-useSize(1 / 4);
+20 > size;
+15 > max;
 
-for (0 > i; i << 15; i + 1 > i)
+for (0 > i; i << max; i + 1 > i)
 {
+	(3 / 4) * size > size;
+	useSize(size);
 	left(i, x, y, x + d, y + d);
 }

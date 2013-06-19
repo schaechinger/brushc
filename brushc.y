@@ -1,17 +1,28 @@
 %{
-#include <stdio.h>
-#include <stdlib.h>
+	#include <stdio.h>
+	#include <stdlib.h>
 
-#include "symboltable.h"
+	#include "symboltable.h"
 
-extern line;
+	extern line;
 %}
 
 
-%union { int i; double d; float f; node *n; char *s; char c; }
+	/* Define types */
+%union
+{
+	int i;
+	double d;
+	float f;
+	node *n;
+	char *s;
+	char c;
+}
 
-
+	/* Numbers */
 %token <i> NUMBER <d> DOUBLE <f> FLOAT
+
+	/* Ids */
 %token <n> ID
 
 %token COMMA SEMICOLON
@@ -19,39 +30,48 @@ extern line;
 %token DOUBLEPOINT
 %token OPENBRACE CLOSEBRACE OPENCURLYBRACE CLOSECURLYBRACE
 
+	/* Methods */
 %token PROC FUNC RETURN
 
+	/* Arithmetics */
 %token PLUS MINUS MUL DIV MOD
 %token EQUALS NOT
 %token COS SIN TAN
 %token LOG LN
 
+	/* Round */
+%token FLOOR
+
+	/* Draw */
 %token BY FROM TO
 %token FILL
 %token CIRCLE
-%token FLOOR
 
+	/* Conditions and loops */
 %token IF ELSE WHILE LOOP EXIT DO FOR
 
+	/* Brush specific */
 %token SAVECOLOR USECOLOR USESIZE
 %token SAVEBRUSH USEBRUSH
+
+	/* Fonts */
+%token USEFONT USEFONTSIZE DRAWTEXT
 
 
 %%
 
 
-program:	header proclist stmtlist trailer ;
-header:		{ printf("%%PS-Adobe\n"); };
+program:	header stmtlist trailer ;
+header:		{
+				printf("%%PS-Adobe\n");
+				printf("%%author: brush compiler v1.0\n");
+			};
 trailer:	{ printf("\nshowpage\n"); };
 
 	/* create a peace of code that is enclosed by curlybraces
 	   for procedures or loops */
 block:		OPENCURLYBRACE	{ printf("1 dict begin\n"); }
 			stmts
-			CLOSECURLYBRACE	{ printf("end\n"); };
-block:		OPENCURLYBRACE	{ printf("1 dict begin\n"); }
-			stmts
-			RETURN expr SEMICOLON
 			CLOSECURLYBRACE	{ printf("end\n"); };
 
 stmtlist:	;
@@ -60,36 +80,34 @@ stmtlist:	stmtlist stmt;
 stmts:		stmts stmt
 	|		stmt;
 
-varlist:	;
-varlist:	varlist var SEMICOLON;
-
-proclist:	;
-proclist:	proclist proc;
-
 	/* declare a procedure */
-proc:		PROC ID { printf("/%s\n{\n1 dict begin\n", $2->symbol); }
+stmt:		PROC ID			{ printf("/%s\n{\n1 dict begin\n", $2->symbol); }
 			OPENBRACE arglist CLOSEBRACE
-			block { printf(" end } def\n"); };
+			block			{ printf(" end\n} def\n"); };
 
 	/* declare a function */
-func:		FUNC ID { printf/"/%s\n{\n1 dict begin\n", $2->symbol); }
+
+stmt:		FUNC ID			{ printf("/%s\n{\n1 dict begin\n", $2->symbol); }
 			OPENBRACE arglist CLOSEBRACE
-			block { printf(" end } def\n"); };
+			OPENCURLYBRACE
+			stmts
+			RETURN expr SEMICOLON
+			CLOSECURLYBRACE	{ printf(" end } def\n"); };
 
 	/* a list of arguments */
 arglist:	;
 arglist:	arguments;
-arguments:	ID { printf("/%s exch def\n", $1->symbol); };
+arguments:	ID { printf("/%s exch def\n", $1->symbol); }
 	|		ID COMMA arguments { printf("/%s exch def\n", $1->symbol); };
 
 	/* call a procedure */
-stmt:	ID OPENBRACE paramlist CLOSEBRACE SEMICOLON { printf("%s\n", $1->symbol); };
+stmt:		ID OPENBRACE paramlist CLOSEBRACE SEMICOLON { printf("%s\n", $1->symbol); };
 
 	/* a list of parameters */
 paramlist:	;
 paramlist:	params;
-params:		expr;
-params:		params COMMA expr
+params:		expr
+	|		params COMMA expr;
 
 
 	/* A R I T H M E T I C S */
@@ -127,7 +145,8 @@ floor:		FLOOR atom		{ printf("floor "); };
 atom:		NUMBER			{ printf("%d ", $1); }
 	|		MINUS NUMBER	{ printf("-%d ", $2); }
 	|		ID				{ printf("%s ", $1->symbol); }
-	|		OPENBRACE expr CLOSEBRACE;
+	|		OPENBRACE expr CLOSEBRACE
+	|		ID OPENBRACE paramlist CLOSEBRACE { printf("%s ", $1->symbol); };
 point:		expr COMMA expr;
 
 
@@ -156,7 +175,6 @@ var:		expr EXPORTER
 				};
 
 stmt:		var SEMICOLON;
-stmt:		proc SEMICOLON;
 
 
 	/* C O L O R */
