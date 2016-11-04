@@ -3,7 +3,7 @@
 #  brushc
 #
 #  Created by Manuel Schächinger on 17.04.2013.
-#  Copyright (c) 2013 Delivery Studios. All rights reserved.
+#  Copyright (c) 2013 Manuel Schächinger & Wolff Schetula
 #
 
 all: brushc brush.ps

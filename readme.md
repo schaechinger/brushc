@@ -1,7 +1,9 @@
 # BRUSH
-> Brush version 0.1
 
-> Created by Manuel Schächinger & Wolff Schetula
+> version 0.1
+
+Brush is a compiler for a simple language named brush to render figures in
+postscript that was created during an university course.
 
 ## Syntax
 

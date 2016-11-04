@@ -2,5 +2,6 @@ brushc.tab.c
 brushc.tab.h
 brushc
 lex.yy.c
-*.ps
-*.output
+.ps
+.output
+.pdf

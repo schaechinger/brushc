@@ -3,7 +3,7 @@
 // brushc test
 //
 // Created by Manuel Schächinger on 12.06.2013
-// Copyright © 2013 Delivery Studios. All rights reserved.
+// Copyright © 2013 Manuel Schächinger & Wolff Schetula
 //
 
 void left(n, xf, yf, xt, yt)
